@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Maintenance - LABWATCH</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-layout">
+
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-brand">
+
+            <div class="brand-icon">
+                LW
+            </div>
+
+            <span>
+                LABWATCH
+            </span>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                MAIN MENU
+            </span>
+
+
+            <a
+                href="dashboard.html"
+                class="nav-item"
+            >
+                <span>▦</span>
+                Dashboard
+            </a>
+
+
+            <a
+                href="equipment.html"
+                class="nav-item"
+            >
+                <span>▣</span>
+                Equipment
+            </a>
+
+
+            <a
+                href="damage.html"
+                class="nav-item"
+            >
+                <span>⚠</span>
+                Damage Records
+            </a>
+
+
+            <a
+                href="maintenance.html"
+                class="nav-item active"
+            >
+                <span>⚙</span>
+                Maintenance
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                SYSTEM
+            </span>
+
+
+            <a
+    href="profile.html"
+    class="nav-item"
+>
+    <span>👤</span>
+    Profile
+</a>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                <span>↪</span>
+                Logout
+            </button>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+
+            <div>
+
+                <span class="page-label">
+                    LABORATORY MANAGEMENT
+                </span>
+
+                <h1>
+                    Maintenance
+                </h1>
+
+            </div>
+
+
+            <div class="user-info">
+    <div class="user-avatar" id="userAvatar">A</div>
+
+    <div class="user-details">
+        <div class="user-name" id="userName">admin</div>
+        <div class="user-role" id="userRole">Administrator</div>
+    </div>
+</div>
+
+
+        </header>
+
+
+
+        <!-- PAGE HEADER -->
+
+        <section class="page-header">
+
+
+            <div>
+
+                <span class="page-label">
+                    MAINTENANCE MANAGEMENT
+                </span>
+
+                <h2>
+                    Equipment Maintenance
+                </h2>
+
+                <p>
+                    Catat dan pantau seluruh kegiatan
+                    maintenance peralatan laboratorium.
+                </p>
+
+            </div>
+
+
+            <button
+                id="addMaintenanceButton"
+                class="primary-button"
+            >
+                + Tambah Maintenance
+            </button>
+
+
+        </section>
+
+
+
+        <!-- MESSAGE -->
+
+        <div
+            id="pageMessage"
+            class="page-message hidden"
+        ></div>
+
+
+
+        <!-- =========================================
+             OVERVIEW
+        ========================================== -->
+
+        <section class="maintenance-card">
+
+
+            <div class="maintenance-overview">
+
+
+                <div class="maintenance-box">
+
+                    <span>
+                        Total Maintenance
+                    </span>
+
+                    <strong id="totalMaintenance">
+                        0
+                    </strong>
+
+                    <small>
+                        seluruh histori
+                    </small>
+
+                </div>
+
+
+                <div class="maintenance-box">
+
+                    <span>
+                        Maintenance Bulan Ini
+                    </span>
+
+                    <strong id="monthlyMaintenance">
+                        0
+                    </strong>
+
+                    <small>
+                        kegiatan bulan berjalan
+                    </small>
+
+                </div>
+
+
+                <div class="maintenance-box">
+
+                    <span>
+                        Maintenance Mendatang
+                    </span>
+
+                    <strong id="upcomingMaintenance">
+                        0
+                    </strong>
+
+                    <small>
+                        jadwal berikutnya
+                    </small>
+
+                </div>
+
+
+                <div class="maintenance-box">
+
+                    <span>
+                        Terlambat
+                    </span>
+
+                    <strong id="overdueMaintenance">
+                        0
+                    </strong>
+
+                    <small>
+                        perlu diperiksa
+                    </small>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             FILTER
+        ========================================== -->
+
+        <section class="equipment-toolbar">
+
+
+            <div class="search-box">
+
+                <span>
+                    🔍
+                </span>
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Cari equipment atau jenis maintenance..."
+                >
+
+            </div>
+
+
+            <div class="filter-group">
+
+
+                <select id="maintenanceTypeFilter">
+    <option value="">Semua Jenis</option>
+    <option value="rutin">Rutin</option>
+    <option value="perbaikan">Perbaikan</option>
+    <option value="penggantian_komponen">
+        Penggantian Komponen
+    </option>
+    <option value="pembersihan">Pembersihan</option>
+</select>
+
+
+                <button
+                    id="resetFilterButton"
+                    class="secondary-button"
+                >
+                    Reset
+                </button>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             MAINTENANCE TABLE
+        ========================================== -->
+
+        <section class="equipment-card">
+
+
+            <div class="table-header">
+
+                <h3>
+                    Maintenance History
+                </h3>
+
+                <p id="maintenanceCount">
+                    0 records
+                </p>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                NO
+                            </th>
+
+                            <th>
+                                DATE
+                            </th>
+
+                            <th>
+                                EQUIPMENT
+                            </th>
+
+                            <th>
+                                TYPE
+                            </th>
+
+                            <th>
+                                TECHNICIAN
+                            </th>
+
+                            <th>
+                                RESULT
+                            </th>
+
+                            <th>
+                                NEXT MAINTENANCE
+                            </th>
+
+                            <th>
+                                ACTION
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="maintenanceTableBody">
+
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="table-empty"
+                            >
+
+                                <div>
+
+                                    <strong>
+                                        Memuat data...
+                                    </strong>
+
+                                    <span>
+                                        Mohon tunggu.
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+
+        </section>
+
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================================
+     MAINTENANCE MODAL
+========================================== -->
+
+<div
+    id="maintenanceModal"
+    class="modal-overlay hidden"
+>
+
+
+    <div class="modal">
+
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3 id="modalTitle">
+                    Tambah Maintenance
+                </h3>
+
+                <p>
+                    Masukkan data maintenance equipment.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="closeModalButton"
+                class="modal-close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <form id="maintenanceForm">
+
+
+            <div class="form-grid">
+
+
+                <!-- EQUIPMENT -->
+
+                <div class="form-group">
+
+                    <label>
+                        Equipment
+                        <span>*</span>
+                    </label>
+
+                    <select
+                        id="equipmentId"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Equipment
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Tanggal Maintenance
+                        <span>*</span>
+                    </label>
+
+                    <input
+                        type="date"
+                        id="maintenanceDate"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- TYPE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Jenis Maintenance
+                        <span>*</span>
+                    </label>
+
+                    <select id="maintenanceType" required>
+    <option value="">Pilih Jenis</option>
+    <option value="rutin">Rutin</option>
+    <option value="perbaikan">Perbaikan</option>
+    <option value="penggantian_komponen">Penggantian Komponen</option>
+    <option value="pembersihan">Pembersihan</option>
+</select>
+
+                </div>
+
+
+
+                <!-- TECHNICIAN -->
+
+                <div class="form-group">
+
+                    <label>
+                        Technician
+                        <span>*</span>
+                    </label>
+
+                    <select
+                        id="technicianId"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Technician
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Deskripsi Maintenance
+                    </label>
+
+                    <textarea
+                        id="description"
+                        placeholder="Jelaskan pekerjaan maintenance yang dilakukan..."
+                    ></textarea>
+
+                </div>
+
+
+
+                <!-- RESULT -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Hasil Maintenance
+                    </label>
+
+                    <textarea
+                        id="result"
+                        placeholder="Tuliskan hasil atau kondisi equipment setelah maintenance..."
+                    ></textarea>
+
+                </div>
+
+
+
+                <!-- NEXT DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Maintenance Berikutnya
+                    </label>
+
+                    <input
+                        type="date"
+                        id="nextMaintenanceDate"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+
+            <div class="modal-footer">
+
+
+                <button
+                    type="button"
+                    id="cancelModalButton"
+                    class="secondary-button"
+                >
+                    Batal
+                </button>
+
+
+                <button
+                    type="submit"
+                    id="saveMaintenanceButton"
+                    class="primary-button"
+                >
+                    Simpan Maintenance
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =========================================
+     SUPABASE
+========================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/maintenance.js"></script>
+
+
+</body>
+
+</html>

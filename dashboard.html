@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard - LABWATCH</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <div class="dashboard-layout">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-brand">
+
+                <div class="brand-icon">
+                    LW
+                </div>
+
+                <span>
+                    LABWATCH
+                </span>
+
+            </div>
+
+
+            <div class="sidebar-section">
+
+                <span class="sidebar-title">
+                    MAIN MENU
+                </span>
+
+
+                <a
+                    href="dashboard.html"
+                    class="nav-item active"
+                >
+
+                    <span>▦</span>
+
+                    Dashboard
+
+                </a>
+
+
+                <a
+                    href="equipment.html"
+                    class="nav-item"
+                >
+
+                    <span>▣</span>
+
+                    Equipment
+
+                </a>
+
+
+                <a
+                    href="damage.html"
+                    class="nav-item"
+                >
+
+                    <span>⚠</span>
+
+                    Damage Records
+
+                </a>
+
+
+                <a
+                    href="maintenance.html"
+                    class="nav-item"
+                >
+
+                    <span>⚙</span>
+
+                    Maintenance
+
+                </a>
+
+            </div>
+
+
+            <div class="sidebar-section">
+
+                <span class="sidebar-title">
+                    SYSTEM
+                </span>
+
+
+                <a
+    href="profile.html"
+    class="nav-item"
+>
+    <span>👤</span>
+    Profile
+</a>
+
+            </div>
+
+
+            <div class="sidebar-bottom">
+
+                <button
+                    id="logoutButton"
+                    class="logout-button"
+                >
+
+                    <span>↪</span>
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN -->
+
+        <main class="main-content">
+
+
+            <!-- TOPBAR -->
+
+            <header class="topbar">
+
+                <div>
+
+                    <p class="topbar-label">
+                        LABORATORY MANAGEMENT
+                    </p>
+
+                    <h1>
+                        Dashboard
+                    </h1>
+
+                </div>
+
+
+                <div class="user-info">
+
+                    <div class="user-avatar">
+                        AD
+                    </div>
+
+                    <div>
+
+                        <strong id="userName">
+                            Administrator
+                        </strong>
+
+                        <small id="userRole">
+                            Admin
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- WELCOME -->
+
+            <section class="welcome-card">
+
+                <div>
+
+                    <span>
+                        SYSTEM OVERVIEW
+                    </span>
+
+                    <h2>
+                        Equipment Health Monitoring
+                    </h2>
+
+                    <p>
+                        Monitor kondisi peralatan laboratorium
+                        dan lakukan preventive maintenance
+                        berdasarkan kondisi perangkat.
+                    </p>
+
+                </div>
+
+                <div class="welcome-icon">
+                    ⚙
+                </div>
+
+            </section>
+
+
+            <!-- STATISTICS -->
+
+            <section class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        ▣
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Total Equipment
+                        </span>
+
+                        <strong id="totalEquipment">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon green">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Good Condition
+                        </span>
+
+                        <strong id="goodEquipment">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon yellow">
+                        !
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Need Monitoring
+                        </span>
+
+                        <strong id="monitorEquipment">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon red">
+                        ⚠
+                    </div>
+
+                    <div>
+
+                        <span>
+                            Critical
+                        </span>
+
+                        <strong id="criticalEquipment">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CONTENT GRID -->
+
+            <section class="dashboard-grid">
+
+
+                <!-- EQUIPMENT STATUS -->
+
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Equipment Condition
+                            </h3>
+
+                            <p>
+                                Kondisi perangkat saat ini
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="condition-list">
+
+                        <div class="condition-item">
+
+                            <div>
+                                <span class="condition-dot good"></span>
+                                Good
+                            </div>
+
+                            <strong id="conditionGood">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="condition-item">
+
+                            <div>
+                                <span class="condition-dot fair"></span>
+                                Fair
+                            </div>
+
+                            <strong id="conditionFair">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="condition-item">
+
+                            <div>
+                                <span class="condition-dot poor"></span>
+                                Poor
+                            </div>
+
+                            <strong id="conditionPoor">
+                                0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="condition-item">
+
+                            <div>
+                                <span class="condition-dot damaged"></span>
+                                Damaged
+                            </div>
+
+                            <strong id="conditionDamaged">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT EQUIPMENT -->
+
+                <div class="dashboard-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h3>
+                                Recent Equipment
+                            </h3>
+
+                            <p>
+                                Peralatan terbaru
+                            </p>
+
+                        </div>
+
+                        <a
+                            href="equipment.html"
+                            class="view-all"
+                        >
+                            View All
+                        </a>
+
+                    </div>
+
+
+                    <div
+                        id="recentEquipment"
+                        class="recent-equipment"
+                    >
+
+                        <div class="empty-state">
+                            Loading data...
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- MAINTENANCE -->
+
+            <section class="dashboard-card maintenance-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            Maintenance Overview
+                        </h3>
+
+                        <p>
+                            Informasi pemeliharaan peralatan
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="maintenance.html"
+                        class="view-all"
+                    >
+                        View All
+                    </a>
+
+                </div>
+
+
+                <div class="maintenance-overview">
+
+                    <div class="maintenance-box">
+
+                        <span>
+                            Maintenance Due
+                        </span>
+
+                        <strong id="maintenanceDue">
+                            0
+                        </strong>
+
+                        <small>
+                            Perlu diperiksa
+                        </small>
+
+                    </div>
+
+
+                    <div class="maintenance-box">
+
+                        <span>
+                            Active Equipment
+                        </span>
+
+                        <strong id="activeEquipment">
+                            0
+                        </strong>
+
+                        <small>
+                            Peralatan aktif
+                        </small>
+
+                    </div>
+
+
+                    <div class="maintenance-box">
+
+                        <span>
+                            In Maintenance
+                        </span>
+
+                        <strong id="inMaintenance">
+                            0
+                        </strong>
+
+                        <small>
+                            Sedang diperbaiki
+                        </small>
+
+                    </div>
+
+
+                    <div class="maintenance-box">
+
+                        <span>
+                            Inactive
+                        </span>
+
+                        <strong id="inactiveEquipment">
+                            0
+                        </strong>
+
+                        <small>
+                            Tidak beroperasi
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </main>
+
+    </div>
+
+
+    <!-- SUPABASE -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="js/supabase.js"></script>
+
+    <script src="js/dashboard.js"></script>
+
+</body>
+
+</html>

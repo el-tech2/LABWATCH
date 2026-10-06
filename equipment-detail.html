@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Equipment Detail - LABWATCH</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-icon">
+                LW
+            </div>
+
+            <span>
+                LABWATCH
+            </span>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                MAIN MENU
+            </span>
+
+
+            <a
+                href="dashboard.html"
+                class="nav-item"
+            >
+                <span>▦</span>
+                Dashboard
+            </a>
+
+
+            <a
+                href="equipment.html"
+                class="nav-item active"
+            >
+                <span>▣</span>
+                Equipment
+            </a>
+
+
+            <a
+                href="damage.html"
+                class="nav-item"
+            >
+                <span>⚠</span>
+                Damage Records
+            </a>
+
+
+            <a
+                href="maintenance.html"
+                class="nav-item"
+            >
+                <span>⚙</span>
+                Maintenance
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                SYSTEM
+            </span>
+
+
+            <a
+    href="profile.html"
+    class="nav-item"
+>
+    <span>👤</span>
+    Profile
+</a>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                <span>↪</span>
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <p class="topbar-label">
+                    LABORATORY MANAGEMENT
+                </p>
+
+                <h1>
+                    Equipment Detail
+                </h1>
+
+            </div>
+
+
+            <div class="user-info">
+
+                <div
+                    class="user-avatar"
+                    id="userAvatar"
+                >
+                    --
+                </div>
+
+                <div>
+
+                    <strong id="userName">
+                        Loading...
+                    </strong>
+
+                    <small id="userRole">
+                        Loading...
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- BACK -->
+
+        <div class="detail-back">
+
+            <a href="equipment.html">
+                ← Kembali ke Equipment
+            </a>
+
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div
+            id="detailLoading"
+            class="detail-loading"
+        >
+            Memuat data equipment...
+        </div>
+
+
+        <!-- DETAIL CONTENT -->
+
+        <div
+            id="detailContent"
+            class="hidden"
+        >
+
+
+            <!-- EQUIPMENT HEADER -->
+
+            <section class="equipment-detail-header">
+
+                <div>
+
+                    <span
+                        class="equipment-code"
+                        id="detailCode"
+                    >
+                        -
+                    </span>
+
+
+                    <h2 id="detailName">
+                        -
+                    </h2>
+
+
+                    <p id="detailCategory">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="detailStatus"
+                >
+                    -
+                </div>
+
+            </section>
+
+
+            <!-- HEALTH SCORE -->
+
+            <section class="health-section">
+
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="page-label">
+                            EQUIPMENT HEALTH
+                        </span>
+
+                        <h2>
+                            Health Score
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="health-grid">
+
+
+                    <!-- SCORE -->
+
+                    <div class="health-score-card">
+
+                        <div class="score-circle">
+
+                            <div>
+
+                                <strong
+                                    id="healthScore"
+                                >
+                                    0
+                                </strong>
+
+                                <span>
+                                    / 100
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <h3>
+                            Health Score
+                        </h3>
+
+
+                        <p>
+                            Nilai kesehatan equipment
+                            berdasarkan kondisi,
+                            usia, status, dan maintenance.
+                        </p>
+
+                    </div>
+
+
+                    <!-- RISK -->
+
+                    <div class="risk-card">
+
+                        <span class="card-small-label">
+                            CURRENT RISK LEVEL
+                        </span>
+
+
+                        <div
+                            id="riskBadge"
+                            class="risk-badge"
+                        >
+                            -
+                        </div>
+
+
+                        <h3 id="riskTitle">
+                            -
+                        </h3>
+
+
+                        <p id="riskDescription">
+                            -
+                        </p>
+
+                    </div>
+
+
+                    <!-- RECOMMENDATION -->
+
+                    <div class="recommendation-card">
+
+                        <span class="card-small-label">
+                            MAINTENANCE RECOMMENDATION
+                        </span>
+
+
+                        <h3>
+                            <span>⚙</span>
+                            Recommendation
+                        </h3>
+
+
+                        <p id="recommendationText">
+                            -
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- BASIC INFORMATION -->
+
+            <section class="detail-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="page-label">
+                            EQUIPMENT INFORMATION
+                        </span>
+
+                        <h2>
+                            Informasi Equipment
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="information-grid">
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Equipment Code
+                        </span>
+
+                        <strong id="infoCode">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Name
+                        </span>
+
+                        <strong id="infoName">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Category
+                        </span>
+
+                        <strong id="infoCategory">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Brand
+                        </span>
+
+                        <strong id="infoBrand">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Model
+                        </span>
+
+                        <strong id="infoModel">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Purchase Year
+                        </span>
+
+                        <strong id="infoPurchaseYear">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Laboratory Location
+                        </span>
+
+                        <strong id="infoLocation">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Condition
+                        </span>
+
+                        <strong id="infoCondition">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Status
+                        </span>
+
+                        <strong id="infoStatus">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="information-item">
+
+                        <span>
+                            Last Maintenance
+                        </span>
+
+                        <strong id="infoMaintenance">
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SCORE BREAKDOWN -->
+
+            <section class="detail-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <span class="page-label">
+                            SCORE ANALYSIS
+                        </span>
+
+                        <h2>
+                            Health Score Breakdown
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="scoreBreakdown"
+                    class="score-breakdown"
+                >
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+<script src="js/equipment-detail.js"></script>
+
+</body>
+
+</html>

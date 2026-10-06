@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Damage Records - LABWATCH</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+
+<body>
+
+<div class="app-container">
+
+    <!-- ========================================= -->
+    <!-- SIDEBAR -->
+    <!-- ========================================= -->
+
+   <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="brand-icon">
+                LW
+            </div>
+
+            <span>
+                LABWATCH
+            </span>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                MAIN MENU
+            </span>
+
+
+            <a
+                href="dashboard.html"
+                class="nav-item"
+            >
+                <span>▦</span>
+                Dashboard
+            </a>
+
+
+            <a
+                href="equipment.html"
+                class="nav-item"
+            >
+                <span>▣</span>
+                Equipment
+            </a>
+
+
+            <a
+                href="damage.html"
+                class="nav-item active"
+            >
+                <span>⚠</span>
+                Damage Records
+            </a>
+
+
+            <a
+                href="maintenance.html"
+                class="nav-item"
+            >
+                <span>⚙</span>
+                Maintenance
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                SYSTEM
+            </span>
+
+
+            <a
+    href="profile.html"
+    class="nav-item"
+>
+    <span>👤</span>
+    Profile
+</a>    
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                <span>↪</span>
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+    <!-- ========================================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ========================================= -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <div class="page-overline">
+                    LABORATORY MANAGEMENT
+                </div>
+
+                <h1>
+                    Damage Records
+                </h1>
+
+            </div>
+
+
+            <div class="user-info">
+
+    <div
+        class="user-avatar"
+        id="userAvatar"
+    >
+        A
+    </div>
+
+    <div>
+
+        <strong id="userName">
+            admin
+        </strong>
+
+        <small id="userRole">
+            Administrator
+        </small>
+
+    </div>
+
+</div>
+        </header>
+
+
+        <!-- ========================================= -->
+        <!-- PAGE HEADER -->
+        <!-- ========================================= -->
+
+        <section class="page-header">
+
+            <div>
+
+                <div class="section-overline">
+                    DAMAGE MANAGEMENT
+                </div>
+
+                <h2>
+                    Equipment Damage History
+                </h2>
+
+                <p>
+                    Catat dan pantau seluruh kerusakan
+                    yang terjadi pada peralatan laboratorium.
+                </p>
+
+            </div>
+
+
+            <button
+                id="addDamageButton"
+                class="primary-button"
+            >
+                + Tambah Damage Record
+            </button>
+
+        </section>
+
+
+        <!-- ========================================= -->
+        <!-- FILTER -->
+        <!-- ========================================= -->
+
+        <section class="content-card filter-card">
+
+            <div class="search-box">
+
+                🔍
+
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Cari equipment atau jenis kerusakan..."
+                >
+
+            </div>
+
+
+            <select id="severityFilter">
+
+                <option value="">
+                    Semua Severity
+                </option>
+
+                <option value="ringan">
+                    Ringan
+                </option>
+
+                <option value="sedang">
+                    Sedang
+                </option>
+
+                <option value="berat">
+                    Berat
+                </option>
+
+            </select>
+
+
+            <select id="statusFilter">
+
+    <option value="">
+        Semua Status
+    </option>
+
+    <option value="dilaporkan">
+        Dilaporkan
+    </option>
+
+    <option value="diproses">
+        Diproses
+    </option>
+
+    <option value="selesai">
+        Selesai
+    </option>
+
+</select>
+
+
+            <button
+                id="resetFilterButton"
+                class="secondary-button"
+            >
+                Reset
+            </button>
+
+        </section>
+
+
+        <!-- ========================================= -->
+        <!-- TABLE -->
+        <!-- ========================================= -->
+
+        <section class="content-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <h3>
+                        Damage History
+                    </h3>
+
+                    <span id="recordCount">
+                        0 records
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                NO
+                            </th>
+
+                            <th>
+                                DATE
+                            </th>
+
+                            <th>
+                                EQUIPMENT
+                            </th>
+
+                            <th>
+                                DAMAGE TYPE
+                            </th>
+
+                            <th>
+                                SEVERITY
+                            </th>
+
+                            <th>
+                                STATUS
+                            </th>
+
+                            <th>
+                                ACTION
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="damageTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="table-loading"
+                            >
+                                Loading damage records...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <div
+            id="pageMessage"
+            class="page-message hidden"
+        ></div>
+
+
+    </main>
+
+</div>
+
+
+<!-- ========================================= -->
+<!-- MODAL -->
+<!-- ========================================= -->
+
+<!-- =========================================
+     DAMAGE MODAL
+========================================== -->
+
+<div
+    id="damageModal"
+    class="modal-overlay hidden"
+>
+
+
+    <div class="modal">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="modal-header">
+
+            <div>
+
+                <h3 id="modalTitle">
+                    Tambah Damage Record
+                </h3>
+
+                <p>
+                    Masukkan data kerusakan equipment.
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="closeModalButton"
+                class="modal-close"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form id="damageForm">
+
+
+            <input
+                type="hidden"
+                id="damageId"
+            >
+
+
+            <div class="form-grid">
+
+
+                <!-- EQUIPMENT -->
+
+                <div class="form-group">
+
+                    <label>
+                        Equipment
+                        <span>*</span>
+                    </label>
+
+                    <select
+                        id="equipmentId"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Equipment
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- DATE -->
+
+                <div class="form-group">
+
+                    <label>
+                        Tanggal Kerusakan
+                        <span>*</span>
+                    </label>
+
+                    <input
+                        type="date"
+                        id="damageDate"
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- DAMAGE TYPE -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Jenis Kerusakan
+                        <span>*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="damageType"
+                        placeholder="Contoh: Keyboard rusak, monitor mati, HDD bermasalah..."
+                        required
+                    >
+
+                </div>
+
+
+
+                <!-- SEVERITY -->
+
+                <div class="form-group">
+
+                    <label>
+                        Tingkat Kerusakan
+                        <span>*</span>
+                    </label>
+
+                    <select
+                        id="severity"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih Tingkat Kerusakan
+                        </option>
+
+                        <option value="ringan">
+                            Ringan
+                        </option>
+
+                        <option value="sedang">
+                            Sedang
+                        </option>
+
+                        <option value="berat">
+                            Berat
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <div class="form-group">
+
+                    <label>
+                        Status Penanganan
+                        <span>*</span>
+                    </label>
+
+                   <select
+    id="damageStatus"
+    required
+>
+
+    <option value="dilaporkan">
+        Dilaporkan
+    </option>
+
+    <option value="diproses">
+        Diproses
+    </option>
+
+    <option value="selesai">
+        Selesai
+    </option>
+
+</select>
+
+                </div>
+
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Deskripsi Kerusakan
+                        <span>*</span>
+                    </label>
+
+                    <textarea
+                        id="description"
+                        placeholder="Jelaskan kondisi atau kerusakan equipment secara detail..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+
+                <!-- ACTION -->
+
+                <div class="form-group full">
+
+                    <label>
+                        Tindakan yang Dilakukan
+                    </label>
+
+                    <textarea
+                        id="actionTaken"
+                        placeholder="Contoh: Pemeriksaan komponen, penggantian kabel, penggantian HDD..."
+                    ></textarea>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- MODAL FOOTER -->
+
+            <div class="modal-footer">
+
+
+                <button
+                    type="button"
+                    id="cancelModalButton"
+                    class="secondary-button"
+                >
+                    Batal
+                </button>
+
+
+                <button
+                    type="submit"
+                    id="saveDamageButton"
+                    class="primary-button"
+                >
+                    Simpan Damage Record
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+<script src="js/damage-records.js"></script>
+
+</body>
+
+</html>

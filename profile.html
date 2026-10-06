@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Profile - LABWATCH</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-layout">
+
+
+    <!-- =========================================
+         SIDEBAR
+    ========================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-brand">
+
+            <div class="brand-icon">
+                LW
+            </div>
+
+            <span>
+                LABWATCH
+            </span>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                MAIN MENU
+            </span>
+
+
+            <a
+                href="dashboard.html"
+                class="nav-item"
+            >
+                <span>▦</span>
+                Dashboard
+            </a>
+
+
+            <a
+                href="equipment.html"
+                class="nav-item"
+            >
+                <span>▣</span>
+                Equipment
+            </a>
+
+
+            <a
+                href="damage.html"
+                class="nav-item"
+            >
+                <span>⚠</span>
+                Damage Records
+            </a>
+
+
+            <a
+                href="maintenance.html"
+                class="nav-item"
+            >
+                <span>⚙</span>
+                Maintenance
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                SYSTEM
+            </span>
+
+
+            <a
+                href="profile.html"
+                class="nav-item active"
+            >
+                <span>👤</span>
+                Profile
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                id="logoutButton"
+                class="logout-button"
+            >
+                <span>↪</span>
+                Logout
+            </button>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="main-content">
+
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+
+            <div>
+
+                <span class="page-label">
+                    LABORATORY MANAGEMENT
+                </span>
+
+                <h1>
+                    Profile
+                </h1>
+
+            </div>
+
+
+            <div class="user-info">
+
+                <div
+                    class="user-avatar"
+                    id="userAvatar"
+                >
+                    A
+                </div>
+
+
+                <div class="user-details">
+
+                    <div
+                        class="user-name"
+                        id="userName"
+                    >
+                        admin
+                    </div>
+
+                    <div
+                        class="user-role"
+                        id="userRole"
+                    >
+                        Administrator
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =========================================
+             PROFILE HEADER
+        ========================================== -->
+
+        <section class="profile-header-card">
+
+
+            <div class="profile-avatar-large" id="profileAvatar">
+                A
+            </div>
+
+
+            <div class="profile-header-info">
+
+                <span class="page-label">
+                    ACCOUNT PROFILE
+                </span>
+
+                <h2 id="profileName">
+                    admin
+                </h2>
+
+                <p id="profileRole">
+                    Administrator
+                </p>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             PROFILE CONTENT
+        ========================================== -->
+
+        <section class="profile-grid">
+
+
+            <!-- PROFILE INFORMATION -->
+
+            <div class="profile-card">
+
+
+                <div class="profile-card-header">
+
+                    <div>
+
+                        <h3>
+                            Profile Information
+                        </h3>
+
+                        <p>
+                            Informasi akun pengguna LABWATCH.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-information">
+
+
+                    <div class="profile-field">
+
+                        <span>
+                            Username
+                        </span>
+
+                        <strong id="profileUsername">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <span>
+                            Email
+                        </span>
+
+                        <strong id="profileEmail">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <span>
+                            Role
+                        </span>
+
+                        <strong id="profileRoleInfo">
+                            -
+                        </strong>
+
+                    </div>
+
+
+                    <div class="profile-field">
+
+                        <span>
+                            Account Status
+                        </span>
+
+                        <strong class="status-active">
+                            Active
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- ACCOUNT INFORMATION -->
+
+            <div class="profile-card">
+
+
+                <div class="profile-card-header">
+
+                    <div>
+
+                        <h3>
+                            Account
+                        </h3>
+
+                        <p>
+                            Informasi akun dan keamanan.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="account-actions">
+
+
+                    <div class="account-action-item">
+
+                        <div>
+
+                            <strong>
+                                Edit Profile
+                            </strong>
+
+                            <span>
+                                Perbarui informasi profil pengguna.
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            id="editProfileButton"
+                            class="secondary-button"
+                        >
+                            Edit
+                        </button>
+
+                    </div>
+
+
+
+                    <div class="account-action-item">
+
+                        <div>
+
+                            <strong>
+                                Password
+                            </strong>
+
+                            <span>
+                                Ubah password akun LABWATCH.
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            id="changePasswordButton"
+                            class="secondary-button"
+                        >
+                            Ubah
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             USER ID
+        ========================================== -->
+
+        <section class="profile-card profile-account-id">
+
+
+            <div class="profile-card-header">
+
+                <div>
+
+                    <h3>
+                        Account ID
+                    </h3>
+
+                    <p>
+                        Identitas pengguna pada sistem LABWATCH.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="account-id-box">
+
+                <span id="userId">
+                    -
+                </span>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =========================================
+     SUPABASE
+========================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="js/supabase.js"></script>
+
+<script src="js/profile.js"></script>
+
+
+</body>
+
+</html>

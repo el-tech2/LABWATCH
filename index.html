@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>LABWATCH - Login</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="login-container">
+
+        <!-- LEFT SIDE -->
+        <div class="login-info">
+            <div class="brand">
+                <div class="brand-icon">LW</div>
+                <span>LABWATCH</span>
+            </div>
+
+            <div class="info-content">
+                <span class="badge">LABORATORY MANAGEMENT</span>
+
+                <h1>
+                    Digital Equipment Health &
+                    <span>Preventive Maintenance</span>
+                </h1>
+
+                <p>
+                    Pantau kondisi peralatan laboratorium,
+                    riwayat kerusakan, dan jadwal pemeliharaan
+                    dalam satu sistem.
+                </p>
+
+                <div class="feature-list">
+
+                    <div class="feature-item">
+                        <div class="feature-icon">✓</div>
+                        <div>
+                            <strong>Equipment Monitoring</strong>
+                            <p>Monitor kondisi peralatan laboratorium.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">✓</div>
+                        <div>
+                            <strong>Health Score</strong>
+                            <p>Identifikasi tingkat kesehatan perangkat.</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">✓</div>
+                        <div>
+                            <strong>Preventive Maintenance</strong>
+                            <p>Antisipasi kerusakan sebelum terjadi.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="copyright">
+                © 2026 LABWATCH
+            </div>
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+        <div class="login-section">
+
+            <div class="login-card">
+
+                <div class="mobile-brand">
+                    <div class="brand-icon">LW</div>
+                    <span>LABWATCH</span>
+                </div>
+
+                <div class="login-header">
+                    <h2>Welcome Back</h2>
+                    <p>
+                        Masuk untuk mengakses sistem LABWATCH
+                    </p>
+                </div>
+
+
+                <!-- LOGIN FORM -->
+                <form id="loginForm">
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+
+                        <div class="input-wrapper">
+                            <span class="input-icon"></span>
+
+                            <input
+                                type="email"
+                                id="email"
+                                placeholder="Masukkan email"
+                                required
+                            >
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+
+                        <div class="input-wrapper">
+                            <span class="input-icon"></span>
+
+                            <input
+                                type="password"
+                                id="password"
+                                placeholder="Masukkan password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="togglePassword"
+                            >
+                                👁
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div class="form-options">
+
+                        <label class="remember">
+                            <input
+                                type="checkbox"
+                                id="rememberMe"
+                            >
+
+                            <span>Ingat saya</span>
+                        </label>
+
+                        <a href="#" id="forgotPassword">
+                            Lupa password?
+                        </a>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="btn-login"
+                        id="loginButton"
+                    >
+                        <span id="loginButtonText">Login</span>
+                        <span
+                            id="loginLoading"
+                            class="loading-spinner hidden"
+                        ></span>
+                    </button>
+
+                </form>
+
+
+                <!-- MESSAGE -->
+                <div
+                    id="message"
+                    class="message hidden"
+                ></div>
+
+
+                <div class="login-footer">
+                    <p>
+                        LABWATCH
+                        <span>•</span>
+                        Laboratory Equipment Management System
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- APPLICATION JS -->
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+
+</body>
+</html>
