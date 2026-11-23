@@ -1,24 +1,137 @@
+
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Equipment Detail - LABWATCH</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
 
+    <style>
+        /* MAINTENANCE HISTORY */
+
+        .maintenance-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .maintenance-summary-card {
+            background: #ffffff;
+            border: 1px solid #e5eaf2;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .maintenance-summary-card span {
+            display: block;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .maintenance-summary-card strong {
+            display: block;
+            color: #172554;
+            font-size: 25px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .maintenance-summary-card small {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .maintenance-history-card {
+            background: #ffffff;
+            border: 1px solid #e5eaf2;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .maintenance-history-heading {
+            padding: 20px;
+            border-bottom: 1px solid #e5eaf2;
+        }
+
+        .maintenance-history-heading h3 {
+            margin: 0 0 6px;
+        }
+
+        .maintenance-history-heading p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .maintenance-history-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .maintenance-history-table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+        }
+
+        .maintenance-history-table th,
+        .maintenance-history-table td {
+            padding: 15px 14px;
+            text-align: left;
+            border-bottom: 1px solid #edf1f7;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        .maintenance-history-table th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .maintenance-history-table td {
+            color: #334155;
+        }
+
+        .maintenance-history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-empty {
+            text-align: center !important;
+            padding: 35px 20px !important;
+            color: #64748b !important;
+        }
+
+        .history-empty strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        .history-empty span {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 768px) {
+            .maintenance-summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
-
 
 <body>
 
@@ -29,87 +142,50 @@
     <aside class="sidebar">
 
         <div class="sidebar-brand">
-
-            <div class="brand-icon">
-                LW
-            </div>
-
-            <span>
-                LABWATCH
-            </span>
-
+            <div class="brand-icon">LW</div>
+            <span>LABWATCH</span>
         </div>
-
 
         <div class="sidebar-section">
 
-            <span class="sidebar-title">
-                MAIN MENU
-            </span>
+            <span class="sidebar-title">MAIN MENU</span>
 
-
-            <a
-                href="dashboard.html"
-                class="nav-item"
-            >
+            <a href="dashboard.html" class="nav-item">
                 <span>▦</span>
                 Dashboard
             </a>
 
-
-            <a
-                href="equipment.html"
-                class="nav-item active"
-            >
+            <a href="equipment.html" class="nav-item active">
                 <span>▣</span>
                 Equipment
             </a>
 
-
-            <a
-                href="damage.html"
-                class="nav-item"
-            >
+            <a href="damage.html" class="nav-item">
                 <span>⚠</span>
                 Damage Records
             </a>
 
-
-            <a
-                href="maintenance.html"
-                class="nav-item"
-            >
+            <a href="maintenance.html" class="nav-item">
                 <span>⚙</span>
                 Maintenance
             </a>
 
         </div>
 
-
         <div class="sidebar-section">
 
-            <span class="sidebar-title">
-                SYSTEM
-            </span>
+            <span class="sidebar-title">SYSTEM</span>
 
-
-            <a
-    href="profile.html"
-    class="nav-item"
->
-    <span>👤</span>
-    Profile
-</a>
+            <a href="profile.html" class="nav-item">
+                <span>👤</span>
+                Profile
+            </a>
 
         </div>
 
-
         <div class="sidebar-bottom">
 
-            <button
-                id="logoutButton"
-                class="logout-button"
-            >
+            <button id="logoutButton" class="logout-button">
                 <span>↪</span>
                 Logout
             </button>
@@ -119,47 +195,31 @@
     </aside>
 
 
-    <!-- MAIN -->
+    <!-- MAIN CONTENT -->
 
     <main class="main-content">
-
 
         <!-- TOPBAR -->
 
         <header class="topbar">
 
             <div>
-
                 <p class="topbar-label">
                     LABORATORY MANAGEMENT
                 </p>
 
-                <h1>
-                    Equipment Detail
-                </h1>
-
+                <h1>Equipment Detail</h1>
             </div>
-
 
             <div class="user-info">
 
-                <div
-                    class="user-avatar"
-                    id="userAvatar"
-                >
+                <div class="user-avatar" id="userAvatar">
                     --
                 </div>
 
                 <div>
-
-                    <strong id="userName">
-                        Loading...
-                    </strong>
-
-                    <small id="userRole">
-                        Loading...
-                    </small>
-
+                    <strong id="userName">Loading...</strong>
+                    <small id="userRole">Loading...</small>
                 </div>
 
             </div>
@@ -167,34 +227,25 @@
         </header>
 
 
-        <!-- BACK -->
+        <!-- BACK BUTTON -->
 
         <div class="detail-back">
-
             <a href="equipment.html">
                 ← Kembali ke Equipment
             </a>
-
         </div>
 
 
         <!-- LOADING -->
 
-        <div
-            id="detailLoading"
-            class="detail-loading"
-        >
+        <div id="detailLoading" class="detail-loading">
             Memuat data equipment...
         </div>
 
 
         <!-- DETAIL CONTENT -->
 
-        <div
-            id="detailContent"
-            class="hidden"
-        >
-
+        <div id="detailContent" class="hidden">
 
             <!-- EQUIPMENT HEADER -->
 
@@ -202,29 +253,17 @@
 
                 <div>
 
-                    <span
-                        class="equipment-code"
-                        id="detailCode"
-                    >
+                    <span class="equipment-code" id="detailCode">
                         -
                     </span>
 
+                    <h2 id="detailName">-</h2>
 
-                    <h2 id="detailName">
-                        -
-                    </h2>
-
-
-                    <p id="detailCategory">
-                        -
-                    </p>
+                    <p id="detailCategory">-</p>
 
                 </div>
 
-
-                <div
-                    id="detailStatus"
-                >
+                <div id="detailStatus">
                     -
                 </div>
 
@@ -235,26 +274,19 @@
 
             <section class="health-section">
 
-
                 <div class="section-heading">
 
                     <div>
-
                         <span class="page-label">
                             EQUIPMENT HEALTH
                         </span>
 
-                        <h2>
-                            Health Score
-                        </h2>
-
+                        <h2>Health Score</h2>
                     </div>
 
                 </div>
 
-
                 <div class="health-grid">
-
 
                     <!-- SCORE -->
 
@@ -263,30 +295,16 @@
                         <div class="score-circle">
 
                             <div>
-
-                                <strong
-                                    id="healthScore"
-                                >
-                                    0
-                                </strong>
-
-                                <span>
-                                    / 100
-                                </span>
-
+                                <strong id="healthScore">0</strong>
+                                <span>/ 100</span>
                             </div>
 
                         </div>
 
-
-                        <h3>
-                            Health Score
-                        </h3>
-
+                        <h3>Health Score</h3>
 
                         <p>
-                            Nilai kesehatan equipment
-                            berdasarkan kondisi,
+                            Nilai kesehatan equipment berdasarkan kondisi,
                             usia, status, dan maintenance.
                         </p>
 
@@ -301,23 +319,13 @@
                             CURRENT RISK LEVEL
                         </span>
 
-
-                        <div
-                            id="riskBadge"
-                            class="risk-badge"
-                        >
+                        <div id="riskBadge" class="risk-badge">
                             -
                         </div>
 
+                        <h3 id="riskTitle">-</h3>
 
-                        <h3 id="riskTitle">
-                            -
-                        </h3>
-
-
-                        <p id="riskDescription">
-                            -
-                        </p>
+                        <p id="riskDescription">-</p>
 
                     </div>
 
@@ -330,16 +338,12 @@
                             MAINTENANCE RECOMMENDATION
                         </span>
 
-
                         <h3>
                             <span>⚙</span>
                             Recommendation
                         </h3>
 
-
-                        <p id="recommendationText">
-                            -
-                        </p>
+                        <p id="recommendationText">-</p>
 
                     </div>
 
@@ -355,149 +359,179 @@
                 <div class="section-heading">
 
                     <div>
-
                         <span class="page-label">
                             EQUIPMENT INFORMATION
                         </span>
 
-                        <h2>
-                            Informasi Equipment
-                        </h2>
+                        <h2>Informasi Equipment</h2>
+                    </div>
+
+                </div>
+
+                <div class="information-grid">
+
+                    <div class="information-item">
+                        <span>Equipment Code</span>
+                        <strong id="infoCode">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Name</span>
+                        <strong id="infoName">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Category</span>
+                        <strong id="infoCategory">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Brand</span>
+                        <strong id="infoBrand">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Model</span>
+                        <strong id="infoModel">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Purchase Year</span>
+                        <strong id="infoPurchaseYear">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Laboratory Location</span>
+                        <strong id="infoLocation">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Condition</span>
+                        <strong id="infoCondition">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Status</span>
+                        <strong id="infoStatus">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Last Maintenance</span>
+                        <strong id="infoMaintenance">-</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- MAINTENANCE HISTORY -->
+
+            <section class="detail-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="page-label">
+                            MAINTENANCE RECORDS
+                        </span>
+
+                        <h2>Riwayat Maintenance</h2>
+
+                        <p>
+                            Riwayat seluruh kegiatan perawatan dan
+                            perbaikan equipment.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- MAINTENANCE SUMMARY -->
+
+                <div class="maintenance-summary-grid">
+
+                    <div class="maintenance-summary-card">
+
+                        <span>Total Servis</span>
+
+                        <strong id="totalServiceCount">0</strong>
+
+                        <small>kali maintenance</small>
+
+                    </div>
+
+                    <div class="maintenance-summary-card">
+
+                        <span>Total Durasi Servis</span>
+
+                        <strong id="totalServiceDuration">
+                            0 detik
+                        </strong>
+
+                        <small>
+                            akumulasi durasi pengerjaan yang tercatat
+                        </small>
+
+                    </div>
+
+                    <div class="maintenance-summary-card">
+
+                        <span>Servis Terakhir</span>
+
+                        <strong id="lastServiceDate">
+                            Belum ada
+                        </strong>
+
+                        <small>tanggal maintenance terakhir</small>
 
                     </div>
 
                 </div>
 
 
-                <div class="information-grid">
+                <!-- MAINTENANCE HISTORY TABLE -->
 
+                <div class="maintenance-history-card">
 
-                    <div class="information-item">
+                    <div class="maintenance-history-heading">
 
-                        <span>
-                            Equipment Code
-                        </span>
+                        <h3>Detail Riwayat Servis</h3>
 
-                        <strong id="infoCode">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div class="information-item">
-
-                        <span>
-                            Name
-                        </span>
-
-                        <strong id="infoName">
-                            -
-                        </strong>
+                        <p id="maintenanceHistoryCount">
+                            0 records
+                        </p>
 
                     </div>
 
+                    <div class="maintenance-history-table-wrapper">
 
-                    <div class="information-item">
+                        <table class="maintenance-history-table">
 
-                        <span>
-                            Category
-                        </span>
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th>TANGGAL</th>
+                                    <th>JENIS</th>
+                                    <th>TEKNISI</th>
+                                    <th>WAKTU MULAI</th>
+                                    <th>WAKTU SELESAI</th>
+                                    <th>DURASI</th>
+                                    <th>HASIL</th>
+                                </tr>
+                            </thead>
 
-                        <strong id="infoCategory">
-                            -
-                        </strong>
+                            <tbody id="maintenanceHistoryBody">
 
-                    </div>
+                                <tr>
+                                    <td colspan="8" class="history-empty">
+                                        Memuat riwayat maintenance...
+                                    </td>
+                                </tr>
 
+                            </tbody>
 
-                    <div class="information-item">
-
-                        <span>
-                            Brand
-                        </span>
-
-                        <strong id="infoBrand">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div class="information-item">
-
-                        <span>
-                            Model
-                        </span>
-
-                        <strong id="infoModel">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div class="information-item">
-
-                        <span>
-                            Purchase Year
-                        </span>
-
-                        <strong id="infoPurchaseYear">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div class="information-item">
-
-                        <span>
-                            Laboratory Location
-                        </span>
-
-                        <strong id="infoLocation">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div class="information-item">
-
-                        <span>
-                            Condition
-                        </span>
-
-                        <strong id="infoCondition">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div class="information-item">
-
-                        <span>
-                            Status
-                        </span>
-
-                        <strong id="infoStatus">
-                            -
-                        </strong>
-
-                    </div>
-
-
-                    <div class="information-item">
-
-                        <span>
-                            Last Maintenance
-                        </span>
-
-                        <strong id="infoMaintenance">
-                            -
-                        </strong>
+                        </table>
 
                     </div>
 
@@ -513,28 +547,21 @@
                 <div class="section-heading">
 
                     <div>
-
                         <span class="page-label">
                             SCORE ANALYSIS
                         </span>
 
-                        <h2>
-                            Health Score Breakdown
-                        </h2>
-
+                        <h2>Health Score Breakdown</h2>
                     </div>
 
                 </div>
 
-
                 <div
                     id="scoreBreakdown"
                     class="score-breakdown"
-                >
-                </div>
+                ></div>
 
             </section>
-
 
         </div>
 
@@ -543,6 +570,8 @@
 </div>
 
 
+<!-- SCRIPTS -->
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="supabase.js"></script>
@@ -550,5 +579,4 @@
 <script src="equipment-detail.js"></script>
 
 </body>
-
 </html>
