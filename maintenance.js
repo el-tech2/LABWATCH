@@ -380,6 +380,7 @@ function populateDamageRecordSelect() {
 // LOAD MAINTENANCE
 // =========================================
 
+
 async function loadMaintenance() {
     const { data, error } = await client
         .from("maintenance_records")
@@ -395,6 +396,8 @@ async function loadMaintenance() {
                 full_name
             )
         `)
+        // Hanya tampilkan pekerjaan yang belum selesai.
+        .is("completed_at", null)
         .order("maintenance_date", {
             ascending: false
         });
@@ -408,6 +411,7 @@ async function loadMaintenance() {
 
     renderOverview();
 }
+
 
 // =========================================
 // RENDER OVERVIEW
@@ -511,9 +515,10 @@ function renderMaintenance(maintenanceList) {
             <tr>
                 <td colspan="9" class="table-empty">
                     <div>
-                        <strong>Belum ada maintenance record</strong>
+                        <strong>Tidak ada pekerjaan maintenance aktif</strong>
                         <span>
-                            Tambahkan histori maintenance equipment.
+                            Semua pekerjaan maintenance telah selesai
+                            atau belum ada pekerjaan baru.
                         </span>
                     </div>
                 </td>
