@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Maintenance Detail - LABWATCH</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">LW</div>
+            <span>LABWATCH</span>
+        </div>
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">MAIN MENU</span>
+
+            <a href="dashboard.html" class="nav-item">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="equipment.html" class="nav-item">
+                <span>▣</span>
+                Equipment
+            </a>
+
+            <a href="damage.html" class="nav-item">
+                <span>⚠</span>
+                Damage Records
+            </a>
+
+            <a href="maintenance.html" class="nav-item active">
+                <span>⚙</span>
+                Maintenance
+            </a>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">SYSTEM</span>
+
+            <a href="profile.html" class="nav-item">
+                <span>👤</span>
+                Profile
+            </a>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <button id="logoutButton" class="logout-button">
+                <span>↪</span>
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div>
+                <div class="topbar-label">
+                    LABORATORY MANAGEMENT
+                </div>
+
+                <h1>Maintenance Detail</h1>
+            </div>
+
+            <div class="user-info">
+
+                <div class="user-avatar" id="userAvatar">
+                    --
+                </div>
+
+                <div>
+                    <strong id="userName">Loading...</strong>
+                    <small id="userRole">Loading...</small>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- BACK BUTTON -->
+        <div class="maintenance-detail-back">
+
+            <a href="maintenance.html">
+                ← Kembali ke Maintenance
+            </a>
+
+        </div>
+
+
+        <!-- LOADING -->
+        <div id="detailLoading" class="detail-loading">
+            Memuat detail maintenance...
+        </div>
+
+
+        <!-- ERROR -->
+        <div
+            id="detailError"
+            class="page-message error hidden"
+        ></div>
+
+
+        <!-- DETAIL CONTENT -->
+        <div id="detailContent" class="hidden">
+
+            <!-- HEADER DETAIL -->
+            <section class="maintenance-detail-header">
+
+                <div>
+                    <span class="detail-label">
+                        MAINTENANCE RECORD
+                    </span>
+
+                    <h2 id="detailEquipmentCode">-</h2>
+
+                    <p id="detailEquipmentName">-</p>
+                </div>
+
+                <div
+                    id="detailDurationBadge"
+                    class="maintenance-duration-badge"
+                >
+                    -
+                </div>
+
+            </section>
+
+
+            <!-- INFORMASI UTAMA -->
+            <section class="equipment-card detail-section">
+
+                <div class="detail-section-header">
+
+                    <div>
+                        <h3>Informasi Maintenance</h3>
+
+                        <p>
+                            Informasi utama kegiatan maintenance equipment
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="maintenance-detail-grid">
+
+                    <div class="detail-info-item">
+                        <span>Tanggal Maintenance</span>
+                        <strong id="detailDate">-</strong>
+                    </div>
+
+                    <div class="detail-info-item">
+                        <span>Jenis Maintenance</span>
+                        <strong id="detailType">-</strong>
+                    </div>
+
+                    <div class="detail-info-item">
+                        <span>Equipment</span>
+                        <strong id="detailEquipment">-</strong>
+                    </div>
+
+                    <div class="detail-info-item">
+                        <span>Teknisi</span>
+                        <strong id="detailTechnician">-</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- WAKTU MAINTENANCE -->
+            <section class="equipment-card detail-section">
+
+                <div class="detail-section-header">
+
+                    <div>
+                        <h3>Waktu Pelaksanaan</h3>
+
+                        <p>
+                            Informasi waktu mulai dan penyelesaian maintenance
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="maintenance-detail-grid">
+
+                    <div class="detail-info-item">
+                        <span>Waktu Mulai</span>
+                        <strong id="detailStartedAt">-</strong>
+                    </div>
+
+                    <div class="detail-info-item">
+                        <span>Waktu Selesai</span>
+                        <strong id="detailCompletedAt">-</strong>
+                    </div>
+
+                    <div class="detail-info-item">
+                        <span>Durasi</span>
+                        <strong id="detailDuration">-</strong>
+                    </div>
+
+                    <div class="detail-info-item">
+                        <span>Maintenance Berikutnya</span>
+                        <strong id="detailNextDate">-</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- DESKRIPSI -->
+            <section class="equipment-card detail-section">
+
+                <div class="detail-section-header">
+                    <div>
+                        <h3>Deskripsi Maintenance</h3>
+                        <p>Catatan kegiatan yang dilakukan</p>
+                    </div>
+                </div>
+
+                <p
+                    class="detail-description"
+                    id="detailDescription"
+                >-</p>
+
+            </section>
+
+
+            <!-- HASIL -->
+            <section class="equipment-card detail-section">
+
+                <div class="detail-section-header">
+                    <div>
+                        <h3>Hasil Maintenance</h3>
+                        <p>Hasil dan kondisi equipment setelah servis</p>
+                    </div>
+                </div>
+
+                <p
+                    class="detail-description"
+                    id="detailResult"
+                >-</p>
+
+                <div class="detail-condition">
+
+                    <span>Kondisi Equipment Setelah Maintenance</span>
+
+                    <strong id="detailCondition">-</strong>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="maintenance-detail.js"></script>
+
+</body>
+</html>
