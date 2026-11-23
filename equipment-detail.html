@@ -1,1088 +1,584 @@
 
-// ==================================================
-// LABWATCH
-// EQUIPMENT DETAIL
-// HEALTH SCORE + MAINTENANCE HISTORY
-// ==================================================
+<!DOCTYPE html>
+<html lang="id">
 
-const client = window.supabaseClient;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-// ==================================================
-// GLOBAL VARIABLES
-// ==================================================
+    <title>Equipment Detail - LABWATCH</title>
 
-let currentUser = null;
-let currentProfile = null;
-let equipment = null;
-let maintenanceHistory = [];
+    <link rel="stylesheet" href="style.css">
 
-// ==================================================
-// INITIALIZE PAGE
-// ==================================================
+    <style>
+        /* MAINTENANCE HISTORY */
 
-async function initializeDetailPage() {
-    try {
-        // Check login session
-        const {
-            data: { session },
-            error: sessionError
-        } = await client.auth.getSession();
-
-        if (sessionError) throw sessionError;
-
-        if (!session) {
-            window.location.href = "index.html";
-            return;
+        .maintenance-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
         }
 
-        currentUser = session.user;
-
-        // Load user profile
-        await loadProfile();
-
-        if (!currentProfile) {
-            showDetailError("Profile pengguna tidak ditemukan.");
-            return;
+        .maintenance-summary-card {
+            background: #ffffff;
+            border: 1px solid #e5eaf2;
+            border-radius: 12px;
+            padding: 20px;
         }
 
-        // Get equipment ID from URL
-        const params = new URLSearchParams(
-            window.location.search
-        );
-
-        const equipmentId = params.get("id");
-
-        if (!equipmentId) {
-            showDetailError("ID equipment tidak ditemukan.");
-            return;
+        .maintenance-summary-card span {
+            display: block;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 10px;
         }
 
-        // Load equipment information
-        await loadEquipmentDetail(equipmentId);
-
-        if (!equipment) return;
-
-        // Load maintenance history
-        await loadMaintenanceHistory(equipmentId);
-
-        // Display maintenance history
-        renderMaintenanceHistory();
-
-    } catch (error) {
-        console.error("Detail initialization error:", error);
-
-        showDetailError(
-            "Terjadi kesalahan saat memuat halaman."
-        );
-    }
-}
-
-// ==================================================
-// LOAD USER PROFILE
-// ==================================================
-
-async function loadProfile() {
-    const { data, error } = await client
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .single();
-
-    if (error) {
-        console.error("Profile error:", error);
-        throw error;
-    }
-
-    currentProfile = data;
-
-    const fullName = data.full_name || "User";
-
-    document.getElementById("userName").textContent =
-        fullName;
-
-    document.getElementById("userRole").textContent =
-        data.role === "admin"
-            ? "Administrator"
-            : "Technician";
-
-    const initials = fullName
-        .split(" ")
-        .map(word => word.charAt(0).toUpperCase())
-        .join("")
-        .substring(0, 2);
-
-    document.getElementById("userAvatar").textContent =
-        initials;
-}
-
-// ==================================================
-// LOAD EQUIPMENT
-// ==================================================
-
-async function loadEquipmentDetail(equipmentId) {
-    const { data, error } = await client
-        .from("equipment")
-        .select("*")
-        .eq("id", equipmentId)
-        .single();
-
-    if (error) {
-        console.error("Equipment detail error:", error);
-
-        showDetailError("Equipment tidak ditemukan.");
-
-        return;
-    }
-
-    equipment = data;
-
-    renderEquipmentDetail();
-}
-
-// ==================================================
-// LOAD MAINTENANCE HISTORY
-// ==================================================
-
-async function loadMaintenanceHistory(equipmentId) {
-    const { data, error } = await client
-        .from("maintenance_records")
-        .select("*")
-        .eq("equipment_id", equipmentId)
-        .order("maintenance_date", {
-            ascending: false
-        });
-
-    if (error) {
-        console.error("Maintenance history error:", error);
-
-        maintenanceHistory = [];
-
-        renderMaintenanceHistoryError(
-            "Riwayat maintenance gagal dimuat. Periksa izin akses database."
-        );
-
-        return;
-    }
-
-    const records = data || [];
-
-    // Collect technician IDs
-    const technicianIds = [
-        ...new Set(
-            records
-                .map(item => item.technician_id)
-                .filter(Boolean)
-        )
-    ];
-
-    let technicianMap = {};
-
-    // Load technician names from profiles
-    if (technicianIds.length > 0) {
-        const {
-            data: technicians,
-            error: technicianError
-        } = await client
-            .from("profiles")
-            .select("id, full_name")
-            .in("id", technicianIds);
-
-        if (technicianError) {
-            console.error(
-                "Technician history error:",
-                technicianError
-            );
-        } else {
-            technicianMap = Object.fromEntries(
-                (technicians || []).map(item => [
-                    item.id,
-                    item.full_name
-                ])
-            );
-        }
-    }
-
-    // Combine maintenance records with technician names
-    maintenanceHistory = records.map(item => ({
-        ...item,
-        technician_name:
-            technicianMap[item.technician_id] ||
-            "Tidak diketahui"
-    }));
-
-    // Sort newest maintenance first
-    maintenanceHistory.sort((a, b) => {
-        const dateA = new Date(
-            a.started_at || a.maintenance_date
-        ).getTime();
-
-        const dateB = new Date(
-            b.started_at || b.maintenance_date
-        ).getTime();
-
-        return dateB - dateA;
-    });
-}
-
-// ==================================================
-// RENDER EQUIPMENT DETAIL
-// ==================================================
-
-function renderEquipmentDetail() {
-    document.getElementById("detailLoading")
-        .classList.add("hidden");
-
-    document.getElementById("detailContent")
-        .classList.remove("hidden");
-
-    // Equipment header
-    document.getElementById("detailCode").textContent =
-        equipment.code || "-";
-
-    document.getElementById("detailName").textContent =
-        equipment.name || "-";
-
-    document.getElementById("detailCategory").textContent =
-        equipment.category || "-";
-
-    document.getElementById("detailStatus").innerHTML = `
-        <span class="status-badge ${getStatusClass(equipment.status)}">
-            ${formatStatus(equipment.status)}
-        </span>
-    `;
-
-    // Equipment information
-    document.getElementById("infoCode").textContent =
-        equipment.code || "-";
-
-    document.getElementById("infoName").textContent =
-        equipment.name || "-";
-
-    document.getElementById("infoCategory").textContent =
-        equipment.category || "-";
-
-    document.getElementById("infoBrand").textContent =
-        equipment.brand || "-";
-
-    document.getElementById("infoModel").textContent =
-        equipment.model || "-";
-
-    document.getElementById("infoPurchaseYear").textContent =
-        equipment.purchase_year || "-";
-
-    document.getElementById("infoLocation").textContent =
-        equipment.lab_location || "-";
-
-    document.getElementById("infoCondition").innerHTML = `
-        <span class="condition-badge ${getConditionClass(equipment.condition)}">
-            ${formatCondition(equipment.condition)}
-        </span>
-    `;
-
-    document.getElementById("infoStatus").innerHTML = `
-        <span class="status-badge ${getStatusClass(equipment.status)}">
-            ${formatStatus(equipment.status)}
-        </span>
-    `;
-
-    document.getElementById("infoMaintenance").textContent =
-        formatDate(equipment.last_maintenance_date);
-
-    // Calculate Health Score
-    const health = calculateHealthScore(equipment);
-
-    renderHealthScore(health);
-}
-
-// ==================================================
-// RENDER MAINTENANCE HISTORY
-// ==================================================
-
-function renderMaintenanceHistory() {
-    const body = document.getElementById(
-        "maintenanceHistoryBody"
-    );
-
-    const totalCount = maintenanceHistory.length;
-
-    // Count only records with valid start and finish times
-    const completedRecords = maintenanceHistory.filter(item => {
-        return (
-            item.started_at &&
-            item.completed_at &&
-            getDurationSeconds(
-                item.started_at,
-                item.completed_at
-            ) !== null
-        );
-    });
-
-    // Calculate total service duration
-    const totalDurationSeconds = completedRecords.reduce(
-        (total, item) => {
-            return total + getDurationSeconds(
-                item.started_at,
-                item.completed_at
-            );
-        },
-        0
-    );
-
-    // Summary: total services
-    document.getElementById("totalServiceCount")
-        .textContent = totalCount;
-
-    // Summary: total duration
-    document.getElementById("totalServiceDuration")
-        .textContent = formatDuration(totalDurationSeconds);
-
-    // Summary: number of records
-    document.getElementById("maintenanceHistoryCount")
-        .textContent = `${totalCount} records`;
-
-    
-    // Summary: latest maintenance date
-    // Gunakan tanggal dari riwayat maintenance jika tersedia.
-    // Jika belum ada riwayat, gunakan tanggal lama dari equipment.
-
-    
-const latestRecord = maintenanceHistory[0];
-
-    const lastMaintenanceDate = latestRecord
-        ? latestRecord.maintenance_date
-        : equipment.last_maintenance_date;
-
-    document.getElementById("lastServiceDate").textContent =
-        lastMaintenanceDate
-            ? formatDate(lastMaintenanceDate)
-            : "Belum ada";
-
-
-
-    // Empty history
-    if (totalCount === 0) {
-        body.innerHTML = `
-            <tr>
-                <td colspan="8" class="history-empty">
-                    <strong>Belum ada riwayat maintenance</strong>
-                    <span>
-                        Riwayat servis equipment akan muncul di sini.
-                    </span>
-                </td>
-            </tr>
-        `;
-
-        return;
-    }
-
-    // Display history
-    body.innerHTML = maintenanceHistory.map(
-        (item, index) => `
-            <tr>
-                <td>${index + 1}</td>
-
-                <td>
-                    ${formatDate(item.maintenance_date)}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        formatMaintenanceType(item.maintenance_type)
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(item.technician_name)}
-                </td>
-
-                <td>
-                    ${formatDateTime(item.started_at)}
-                </td>
-
-                <td>
-                    ${formatDateTime(item.completed_at)}
-                </td>
-
-                <td>
-                    ${escapeHtml(getDurationText(item))}
-                </td>
-
-                <td>
-                    ${escapeHtml(item.result || "-")}
-                </td>
-            </tr>
-        `
-    ).join("");
-}
-
-// ==================================================
-// MAINTENANCE HISTORY ERROR
-// ==================================================
-
-function renderMaintenanceHistoryError(message) {
-    const body = document.getElementById(
-        "maintenanceHistoryBody"
-    );
-
-    body.innerHTML = `
-        <tr>
-            <td colspan="8" class="history-empty">
-                <strong>Riwayat tidak dapat dimuat</strong>
-                <span>${escapeHtml(message)}</span>
-            </td>
-        </tr>
-    `;
-
-    document.getElementById("totalServiceCount")
-        .textContent = "-";
-
-    document.getElementById("totalServiceDuration")
-        .textContent = "-";
-
-    document.getElementById("lastServiceDate")
-        .textContent = "-";
-
-    document.getElementById("maintenanceHistoryCount")
-        .textContent = "Gagal dimuat";
-}
-
-// ==================================================
-// CALCULATE SERVICE DURATION
-// ==================================================
-
-function getDurationSeconds(start, end) {
-    if (!start || !end) {
-        return null;
-    }
-
-    const startTime = new Date(start).getTime();
-    const endTime = new Date(end).getTime();
-
-    if (
-        Number.isNaN(startTime) ||
-        Number.isNaN(endTime) ||
-        endTime < startTime
-    ) {
-        return null;
-    }
-
-    return Math.floor(
-        (endTime - startTime) / 1000
-    );
-}
-
-// ==================================================
-// GET DURATION TEXT
-// ==================================================
-
-function getDurationText(item) {
-    if (!item.started_at) {
-        return "Belum tercatat";
-    }
-
-    if (!item.completed_at) {
-        return "Sedang berlangsung";
-    }
-
-    const seconds = getDurationSeconds(
-        item.started_at,
-        item.completed_at
-    );
-
-    if (seconds === null) {
-        return "Data waktu tidak valid";
-    }
-
-    return formatDuration(seconds);
-}
-
-// ==================================================
-// FORMAT DURATION
-// ==================================================
-
-function formatDuration(totalSeconds) {
-    if (
-        totalSeconds === null ||
-        totalSeconds === undefined ||
-        totalSeconds < 0
-    ) {
-        return "Belum tercatat";
-    }
-
-    let remaining = Math.floor(totalSeconds);
-
-    const days = Math.floor(remaining / 86400);
-    remaining %= 86400;
-
-    const hours = Math.floor(remaining / 3600);
-    remaining %= 3600;
-
-    const minutes = Math.floor(remaining / 60);
-    const seconds = remaining % 60;
-
-    const parts = [];
-
-    if (days > 0) {
-        parts.push(`${days} hari`);
-    }
-
-    if (hours > 0) {
-        parts.push(`${hours} jam`);
-    }
-
-    if (minutes > 0) {
-        parts.push(`${minutes} menit`);
-    }
-
-    if (seconds > 0 || parts.length === 0) {
-        parts.push(`${seconds} detik`);
-    }
-
-    return parts.join(" ");
-}
-
-// ==================================================
-// FORMAT MAINTENANCE TYPE
-// ==================================================
-
-function formatMaintenanceType(type) {
-    switch (type) {
-        case "rutin":
-            return "Rutin";
-
-        case "perbaikan":
-            return "Perbaikan";
-
-        case "penggantian_komponen":
-            return "Penggantian Komponen";
-
-        case "pembersihan":
-            return "Pembersihan";
-
-        default:
-            return type || "-";
-    }
-}
-
-// ==================================================
-// FORMAT DATE
-// ==================================================
-
-function formatDate(value) {
-    if (!value) {
-        return "Belum ada data";
-    }
-
-    // Date-only values are parsed locally to avoid
-    // timezone shifting the displayed calendar date.
-    const parts = String(value).split("-");
-
-    if (parts.length !== 3) {
-        return "-";
-    }
-
-    const date = new Date(
-        Number(parts[0]),
-        Number(parts[1]) - 1,
-        Number(parts[2])
-    );
-
-    if (Number.isNaN(date.getTime())) {
-        return "-";
-    }
-
-    return date.toLocaleDateString("id-ID", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric"
-    });
-}
-
-// ==================================================
-// FORMAT DATE AND TIME
-// ==================================================
-
-function formatDateTime(value) {
-    if (!value) {
-        return "Belum tercatat";
-    }
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-        return "-";
-    }
-
-    return date.toLocaleString("id-ID", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: false
-    });
-}
-
-// ==================================================
-// HEALTH SCORE CALCULATION
-// ==================================================
-
-function calculateHealthScore(equipment) {
-    let score = 100;
-
-    const breakdown = [];
-
-    // ----------------------------------------------
-    // 1. CONDITION
-    // ----------------------------------------------
-
-    let conditionPenalty = 0;
-
-    if (equipment.condition === "baik") {
-        conditionPenalty = 0;
-    } else if (equipment.condition === "cukup") {
-        conditionPenalty = 20;
-    } else if (equipment.condition === "buruk") {
-        conditionPenalty = 40;
-    }
-
-    score -= conditionPenalty;
-
-    breakdown.push({
-        label: "Kondisi Equipment",
-        value: conditionPenalty,
-        description:
-            equipment.condition === "baik"
-                ? "Kondisi equipment baik."
-                : equipment.condition === "cukup"
-                    ? "Equipment dalam kondisi cukup."
-                    : "Equipment berada dalam kondisi buruk."
-    });
-
-    // ----------------------------------------------
-    // 2. EQUIPMENT AGE
-    // ----------------------------------------------
-
-    const currentYear = new Date().getFullYear();
-
-    let agePenalty = 0;
-
-    let ageDescription =
-        "Equipment masih relatif baru.";
-
-    if (equipment.purchase_year) {
-        const age =
-            currentYear - Number(equipment.purchase_year);
-
-        if (age <= 2) {
-            agePenalty = 0;
-        } else if (age <= 5) {
-            agePenalty = 10;
-            ageDescription =
-                "Equipment berusia 3–5 tahun.";
-        } else if (age <= 8) {
-            agePenalty = 20;
-            ageDescription =
-                "Equipment berusia 6–8 tahun.";
-        } else {
-            agePenalty = 30;
-            ageDescription =
-                "Equipment berusia lebih dari 8 tahun.";
-        }
-    }
-
-    score -= agePenalty;
-
-    breakdown.push({
-        label: "Usia Equipment",
-        value: agePenalty,
-        description: ageDescription
-    });
-
-    // ----------------------------------------------
-    // 3. MAINTENANCE
-    // ----------------------------------------------
-
-    let maintenancePenalty = 0;
-
-    let maintenanceDescription =
-        "Maintenance masih relatif baru.";
-
-    if (equipment.last_maintenance_date) {
-        const lastMaintenance = new Date(
-            equipment.last_maintenance_date + "T00:00:00"
-        );
-
-        const today = new Date();
-
-        const difference =
-            today.getTime() - lastMaintenance.getTime();
-
-        const days = Math.floor(
-            difference / (1000 * 60 * 60 * 24)
-        );
-
-        if (days <= 90) {
-            maintenancePenalty = 0;
-        } else if (days <= 180) {
-            maintenancePenalty = 5;
-            maintenanceDescription =
-                "Maintenance terakhir 3–6 bulan lalu.";
-        } else if (days <= 365) {
-            maintenancePenalty = 10;
-            maintenanceDescription =
-                "Maintenance terakhir 6–12 bulan lalu.";
-        } else {
-            maintenancePenalty = 20;
-            maintenanceDescription =
-                "Equipment belum di-maintenance lebih dari 1 tahun.";
-        }
-    } else {
-        maintenancePenalty = 20;
-        maintenanceDescription =
-            "Belum terdapat data maintenance.";
-    }
-
-    score -= maintenancePenalty;
-
-    breakdown.push({
-        label: "Maintenance",
-        value: maintenancePenalty,
-        description: maintenanceDescription
-    });
-
-    // ----------------------------------------------
-    // 4. STATUS
-    // ----------------------------------------------
-
-    let statusPenalty = 0;
-
-    let statusDescription = "Equipment aktif.";
-
-    if (equipment.status === "aktif") {
-        statusPenalty = 0;
-    } else if (equipment.status === "dalam_perbaikan") {
-        statusPenalty = 15;
-        statusDescription =
-            "Equipment sedang dalam perbaikan.";
-    } else if (equipment.status === "nonaktif") {
-        statusPenalty = 20;
-        statusDescription =
-            "Equipment berstatus nonaktif.";
-    }
-
-    score -= statusPenalty;
-
-    breakdown.push({
-        label: "Status Equipment",
-        value: statusPenalty,
-        description: statusDescription
-    });
-
-    // ----------------------------------------------
-    // NORMALIZE SCORE
-    // ----------------------------------------------
-
-    score = Math.max(
-        0,
-        Math.min(100, score)
-    );
-
-    // ----------------------------------------------
-    // RISK LEVEL
-    // ----------------------------------------------
-
-    const risk = calculateRiskLevel(score);
-
-    // ----------------------------------------------
-    // RECOMMENDATION
-    // ----------------------------------------------
-
-    const recommendation = generateRecommendation(
-        score,
-        equipment
-    );
-
-    return {
-        score,
-        risk,
-        recommendation,
-        breakdown
-    };
-}
-
-// ==================================================
-// CALCULATE RISK LEVEL
-// ==================================================
-
-function calculateRiskLevel(score) {
-    if (score >= 80) {
-        return {
-            level: "GOOD",
-            title: "Kondisi Baik",
-            description:
-                "Equipment berada dalam kondisi yang baik dan dapat digunakan secara normal.",
-            className: "good"
-        };
-    }
-
-    if (score >= 60) {
-        return {
-            level: "MONITOR",
-            title: "Perlu Dipantau",
-            description:
-                "Equipment masih dapat digunakan, tetapi perlu dilakukan pemantauan berkala.",
-            className: "monitor"
-        };
-    }
-
-    if (score >= 40) {
-        return {
-            level: "WARNING",
-            title: "Perlu Perhatian",
-            description:
-                "Equipment memiliki beberapa faktor risiko dan disarankan untuk segera diperiksa.",
-            className: "warning"
-        };
-    }
-
-    return {
-        level: "CRITICAL",
-        title: "Kondisi Kritis",
-        description:
-            "Equipment memiliki risiko tinggi dan memerlukan tindakan maintenance segera.",
-        className: "critical"
-    };
-}
-
-// ==================================================
-// GENERATE RECOMMENDATION
-// ==================================================
-
-function generateRecommendation(score, equipment) {
-    if (score >= 80) {
-        return "Equipment dapat digunakan secara normal. Lakukan pemeriksaan rutin sesuai jadwal maintenance.";
-    }
-
-    if (score >= 60) {
-        return "Lakukan monitoring kondisi equipment dan jadwalkan pemeriksaan berkala untuk mencegah penurunan kondisi.";
-    }
-
-    if (score >= 40) {
-        if (equipment.status === "dalam_perbaikan") {
-            return "Prioritaskan proses perbaikan dan lakukan pemeriksaan ulang sebelum equipment digunakan kembali.";
+        .maintenance-summary-card strong {
+            display: block;
+            color: #172554;
+            font-size: 25px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
         }
 
-        return "Disarankan melakukan pemeriksaan dan maintenance dalam waktu dekat.";
-    }
+        .maintenance-summary-card small {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 6px;
+        }
 
-    return "Segera lakukan pemeriksaan menyeluruh dan maintenance. Pertimbangkan menghentikan penggunaan equipment sampai kondisi dinyatakan aman.";
-}
+        .maintenance-history-card {
+            background: #ffffff;
+            border: 1px solid #e5eaf2;
+            border-radius: 12px;
+            overflow: hidden;
+        }
 
-// ==================================================
-// RENDER HEALTH SCORE
-// ==================================================
+        .maintenance-history-heading {
+            padding: 20px;
+            border-bottom: 1px solid #e5eaf2;
+        }
 
-function renderHealthScore(health) {
-    document.getElementById("healthScore").textContent =
-        health.score;
+        .maintenance-history-heading h3 {
+            margin: 0 0 6px;
+        }
 
-    const riskBadge = document.getElementById("riskBadge");
+        .maintenance-history-heading p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 13px;
+        }
 
-    riskBadge.textContent = health.risk.level;
+        .maintenance-history-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
 
-    riskBadge.className =
-        `risk-badge ${health.risk.className}`;
+        .maintenance-history-table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+        }
 
-    document.getElementById("riskTitle").textContent =
-        health.risk.title;
+        .maintenance-history-table th,
+        .maintenance-history-table td {
+            padding: 15px 14px;
+            text-align: left;
+            border-bottom: 1px solid #edf1f7;
+            font-size: 13px;
+            vertical-align: top;
+        }
 
-    document.getElementById("riskDescription").textContent =
-        health.risk.description;
+        .maintenance-history-table th {
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
 
-    document.getElementById("recommendationText").textContent =
-        health.recommendation;
+        .maintenance-history-table td {
+            color: #334155;
+        }
 
-    renderScoreBreakdown(health.breakdown);
-}
+        .maintenance-history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
 
-// ==================================================
-// RENDER SCORE BREAKDOWN
-// ==================================================
+        .history-empty {
+            text-align: center !important;
+            padding: 35px 20px !important;
+            color: #64748b !important;
+        }
 
-function renderScoreBreakdown(breakdown) {
-    const container = document.getElementById(
-        "scoreBreakdown"
-    );
+        .history-empty strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #334155;
+        }
 
-    container.innerHTML = breakdown.map(item => `
-        <div class="score-item">
+        .history-empty span {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+        }
 
-            <div class="score-item-top">
+        @media (max-width: 768px) {
+            .maintenance-summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
 
-                <strong>
-                    ${escapeHtml(item.label)}
-                </strong>
+<body>
 
-                <span>
-                    -${item.value} poin
-                </span>
+<div class="dashboard-layout">
 
-            </div>
+    <!-- SIDEBAR -->
 
-            <p>
-                ${escapeHtml(item.description)}
-            </p>
+    <aside class="sidebar">
 
+        <div class="sidebar-brand">
+            <div class="brand-icon">LW</div>
+            <span>LABWATCH</span>
         </div>
-    `).join("");
-}
 
-// ==================================================
-// FORMAT CONDITION
-// ==================================================
+        <div class="sidebar-section">
 
-function formatCondition(condition) {
-    switch (condition) {
-        case "baik":
-            return "Baik";
+            <span class="sidebar-title">MAIN MENU</span>
 
-        case "cukup":
-            return "Cukup";
+            <a href="dashboard.html" class="nav-item">
+                <span>▦</span>
+                Dashboard
+            </a>
 
-        case "buruk":
-            return "Buruk";
+            <a href="equipment.html" class="nav-item active">
+                <span>▣</span>
+                Equipment
+            </a>
 
-        default:
-            return condition || "-";
-    }
-}
+            <a href="damage.html" class="nav-item">
+                <span>⚠</span>
+                Damage Records
+            </a>
 
-// ==================================================
-// CONDITION CSS CLASS
-// ==================================================
-
-function getConditionClass(condition) {
-    switch (condition) {
-        case "baik":
-            return "good";
-
-        case "cukup":
-            return "fair";
-
-        case "buruk":
-            return "poor";
-
-        default:
-            return "";
-    }
-}
-
-// ==================================================
-// FORMAT STATUS
-// ==================================================
-
-function formatStatus(status) {
-    switch (status) {
-        case "aktif":
-            return "Aktif";
-
-        case "dalam_perbaikan":
-            return "Dalam Perbaikan";
-
-        case "nonaktif":
-            return "Nonaktif";
-
-        default:
-            return status || "-";
-    }
-}
-
-// ==================================================
-// STATUS CSS CLASS
-// ==================================================
-
-function getStatusClass(status) {
-    switch (status) {
-        case "aktif":
-            return "active";
-
-        case "dalam_perbaikan":
-            return "maintenance";
-
-        case "nonaktif":
-            return "inactive";
-
-        default:
-            return "";
-    }
-}
-
-// ==================================================
-// ESCAPE HTML
-// ==================================================
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) {
-        return "";
-    }
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-// ==================================================
-// SHOW DETAIL ERROR
-// ==================================================
-
-function showDetailError(message) {
-    document.getElementById("detailLoading").innerHTML = `
-        <div class="detail-error">
-
-            <strong>
-                Equipment tidak dapat dimuat
-            </strong>
-
-            <p>
-                ${escapeHtml(message)}
-            </p>
-
-            <a href="equipment.html">
-                ← Kembali ke Equipment
+            <a href="maintenance.html" class="nav-item">
+                <span>⚙</span>
+                Maintenance
             </a>
 
         </div>
-    `;
-}
 
-// ==================================================
-// LOGOUT
-// ==================================================
+        <div class="sidebar-section">
 
-document
-    .getElementById("logoutButton")
-    .addEventListener("click", async function() {
+            <span class="sidebar-title">SYSTEM</span>
 
-        const confirmed = confirm(
-            "Apakah kamu yakin ingin logout?"
-        );
+            <a href="profile.html" class="nav-item">
+                <span>👤</span>
+                Profile
+            </a>
 
-        if (!confirmed) {
-            return;
-        }
+        </div>
 
-        await client.auth.signOut();
+        <div class="sidebar-bottom">
 
-        window.location.href = "index.html";
-    });
+            <button id="logoutButton" class="logout-button">
+                <span>↪</span>
+                Logout
+            </button>
 
-// ==================================================
-// START APPLICATION
-// ==================================================
+        </div>
 
-initializeDetailPage();
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div>
+                <p class="topbar-label">
+                    LABORATORY MANAGEMENT
+                </p>
+
+                <h1>Equipment Detail</h1>
+            </div>
+
+            <div class="user-info">
+
+                <div class="user-avatar" id="userAvatar">
+                    --
+                </div>
+
+                <div>
+                    <strong id="userName">Loading...</strong>
+                    <small id="userRole">Loading...</small>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- BACK BUTTON -->
+
+        <div class="detail-back">
+            <a href="equipment.html">
+                ← Kembali ke Equipment
+            </a>
+        </div>
+
+
+        <!-- LOADING -->
+
+        <div id="detailLoading" class="detail-loading">
+            Memuat data equipment...
+        </div>
+
+
+        <!-- DETAIL CONTENT -->
+
+        <div id="detailContent" class="hidden">
+
+            <!-- EQUIPMENT HEADER -->
+
+            <section class="equipment-detail-header">
+
+                <div>
+
+                    <span class="equipment-code" id="detailCode">
+                        -
+                    </span>
+
+                    <h2 id="detailName">-</h2>
+
+                    <p id="detailCategory">-</p>
+
+                </div>
+
+                <div id="detailStatus">
+                    -
+                </div>
+
+            </section>
+
+
+            <!-- HEALTH SCORE -->
+
+            <section class="health-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="page-label">
+                            EQUIPMENT HEALTH
+                        </span>
+
+                        <h2>Health Score</h2>
+                    </div>
+
+                </div>
+
+                <div class="health-grid">
+
+                    <!-- SCORE -->
+
+                    <div class="health-score-card">
+
+                        <div class="score-circle">
+
+                            <div>
+                                <strong id="healthScore">0</strong>
+                                <span>/ 100</span>
+                            </div>
+
+                        </div>
+
+                        <h3>Health Score</h3>
+
+                        <p>
+                            Nilai kesehatan equipment berdasarkan kondisi,
+                            usia, status, dan maintenance.
+                        </p>
+
+                    </div>
+
+
+                    <!-- RISK -->
+
+                    <div class="risk-card">
+
+                        <span class="card-small-label">
+                            CURRENT RISK LEVEL
+                        </span>
+
+                        <div id="riskBadge" class="risk-badge">
+                            -
+                        </div>
+
+                        <h3 id="riskTitle">-</h3>
+
+                        <p id="riskDescription">-</p>
+
+                    </div>
+
+
+                    <!-- RECOMMENDATION -->
+
+                    <div class="recommendation-card">
+
+                        <span class="card-small-label">
+                            MAINTENANCE RECOMMENDATION
+                        </span>
+
+                        <h3>
+                            <span>⚙</span>
+                            Recommendation
+                        </h3>
+
+                        <p id="recommendationText">-</p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- BASIC INFORMATION -->
+
+            <section class="detail-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="page-label">
+                            EQUIPMENT INFORMATION
+                        </span>
+
+                        <h2>Informasi Equipment</h2>
+                    </div>
+
+                </div>
+
+                <div class="information-grid">
+
+                    <div class="information-item">
+                        <span>Equipment Code</span>
+                        <strong id="infoCode">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Name</span>
+                        <strong id="infoName">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Category</span>
+                        <strong id="infoCategory">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Brand</span>
+                        <strong id="infoBrand">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Model</span>
+                        <strong id="infoModel">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Purchase Year</span>
+                        <strong id="infoPurchaseYear">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Laboratory Location</span>
+                        <strong id="infoLocation">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Condition</span>
+                        <strong id="infoCondition">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Status</span>
+                        <strong id="infoStatus">-</strong>
+                    </div>
+
+                    <div class="information-item">
+                        <span>Last Maintenance</span>
+                        <strong id="infoMaintenance">-</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- MAINTENANCE HISTORY -->
+
+            <section class="detail-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="page-label">
+                            MAINTENANCE RECORDS
+                        </span>
+
+                        <h2>Riwayat Maintenance</h2>
+
+                        <p>
+                            Riwayat seluruh kegiatan perawatan dan
+                            perbaikan equipment.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- MAINTENANCE SUMMARY -->
+
+                <div class="maintenance-summary-grid">
+
+                    <div class="maintenance-summary-card">
+
+                        <span>Total Servis</span>
+
+                        <strong id="totalServiceCount">0</strong>
+
+                        <small>kali maintenance</small>
+
+                    </div>
+
+                    <div class="maintenance-summary-card">
+
+                        <span>Total Durasi Servis</span>
+
+                        <strong id="totalServiceDuration">
+                            0 detik
+                        </strong>
+
+                        <small>
+                            akumulasi durasi pengerjaan yang tercatat
+                        </small>
+
+                    </div>
+
+                    <div class="maintenance-summary-card">
+
+                        <span>Servis Terakhir</span>
+
+                        <strong id="lastServiceDate">
+                            Belum ada
+                        </strong>
+
+                        <small>tanggal maintenance terakhir</small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MAINTENANCE HISTORY TABLE -->
+
+                <div class="maintenance-history-card">
+
+                    <div class="maintenance-history-heading">
+
+                        <h3>Detail Riwayat Servis</h3>
+
+                        <p id="maintenanceHistoryCount">
+                            0 records
+                        </p>
+
+                    </div>
+
+                    <div class="maintenance-history-table-wrapper">
+
+                        <table class="maintenance-history-table">
+
+                            <thead>
+                                <tr>
+                                    <th>NO</th>
+                                    <th>TANGGAL</th>
+                                    <th>JENIS</th>
+                                    <th>TEKNISI</th>
+                                    <th>WAKTU MULAI</th>
+                                    <th>WAKTU SELESAI</th>
+                                    <th>DURASI</th>
+                                    <th>HASIL</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="maintenanceHistoryBody">
+
+                                <tr>
+                                    <td colspan="8" class="history-empty">
+                                        Memuat riwayat maintenance...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SCORE BREAKDOWN -->
+
+            <section class="detail-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <span class="page-label">
+                            SCORE ANALYSIS
+                        </span>
+
+                        <h2>Health Score Breakdown</h2>
+                    </div>
+
+                </div>
+
+                <div
+                    id="scoreBreakdown"
+                    class="score-breakdown"
+                ></div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<!-- SCRIPTS -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase.js"></script>
+
+<script src="equipment-detail.js?v=3"></script>
+
+</body>
+</html>
+
