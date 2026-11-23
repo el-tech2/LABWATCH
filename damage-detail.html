@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Damage Detail - LABWATCH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="app-container">
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">LW</div>
+            <span>LABWATCH</span>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="sidebar-title">MAIN MENU</span>
+
+            <a href="dashboard.html" class="nav-item">
+                <span>▦</span> Dashboard
+            </a>
+
+            <a href="equipment.html" class="nav-item">
+                <span>▣</span> Equipment
+            </a>
+
+            <a href="damage.html" class="nav-item active">
+                <span>⚠</span> Damage Records
+            </a>
+
+            <a href="maintenance.html" class="nav-item">
+                <span>⚙</span> Maintenance
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <span class="sidebar-title">SYSTEM</span>
+
+            <a href="profile.html" class="nav-item">
+                <span>👤</span> Profile
+            </a>
+        </div>
+
+        <div class="sidebar-bottom">
+            <button id="logoutButton" class="logout-button">
+                <span>↪</span> Logout
+            </button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <div class="page-overline">LABORATORY MANAGEMENT</div>
+                <h1>Damage Record Detail</h1>
+            </div>
+
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">--</div>
+                <div>
+                    <strong id="userName">Loading...</strong>
+                    <small id="userRole">Loading...</small>
+                </div>
+            </div>
+        </header>
+
+        <div class="detail-back">
+            <a href="damage.html">← Kembali ke Damage Records</a>
+        </div>
+
+        <div id="detailLoading" class="detail-loading">
+            Memuat detail laporan kerusakan...
+        </div>
+
+        <div id="detailError" class="page-message error hidden"></div>
+
+        <div id="detailContent" class="hidden">
+
+            <section class="damage-detail-header">
+                <div>
+                    <span class="page-label">DAMAGE REPORT</span>
+                    <h2 id="detailDamageType">-</h2>
+                    <p id="detailEquipment">-</p>
+                </div>
+
+                <div id="detailStatus">-</div>
+            </section>
+
+            <section class="content-card damage-detail-card">
+                <div class="card-header">
+                    <div>
+                        <h3>Informasi Kerusakan</h3>
+                        <span>Informasi utama laporan kerusakan equipment</span>
+                    </div>
+                </div>
+
+                <div class="damage-detail-grid">
+
+                    <div class="damage-info-item">
+                        <span>Tanggal Kerusakan</span>
+                        <strong id="detailDate">-</strong>
+                    </div>
+
+                    <div class="damage-info-item">
+                        <span>Equipment</span>
+                        <strong id="detailEquipmentName">-</strong>
+                    </div>
+
+                    <div class="damage-info-item">
+                        <span>Kode Equipment</span>
+                        <strong id="detailEquipmentCode">-</strong>
+                    </div>
+
+                    <div class="damage-info-item">
+                        <span>Tingkat Kerusakan</span>
+                        <strong id="detailSeverity">-</strong>
+                    </div>
+
+                    <div class="damage-info-item">
+                        <span>Status Laporan</span>
+                        <strong id="detailStatusText">-</strong>
+                    </div>
+
+                    <div class="damage-info-item">
+                        <span>Waktu Diambil</span>
+                        <strong id="detailAssignedAt">-</strong>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="content-card damage-detail-card">
+                <div class="card-header">
+                    <div>
+                        <h3>Penanggung Jawab</h3>
+                        <span>Informasi teknisi yang menangani laporan</span>
+                    </div>
+                </div>
+
+                <div class="damage-assignee">
+                    <div class="assignee-avatar" id="technicianAvatar">?</div>
+                    <div>
+                        <span>Teknisi yang Menangani</span>
+                        <strong id="detailTechnician">-</strong>
+                        <small id="detailTechnicianRole">-</small>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-card damage-detail-card">
+                <div class="card-header">
+                    <div>
+                        <h3>Deskripsi Kerusakan</h3>
+                        <span>Penjelasan kondisi kerusakan equipment</span>
+                    </div>
+                </div>
+
+                <p class="damage-description" id="detailDescription">-</p>
+            </section>
+
+            <section class="content-card damage-detail-card">
+                <div class="card-header">
+                    <div>
+                        <h3>Tindakan Penanganan</h3>
+                        <span>Informasi tindakan yang dilakukan</span>
+                    </div>
+                </div>
+
+                <p class="damage-description" id="detailAction">-</p>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+<script src="damage-detail.js"></script>
+</body>
+</html>
