@@ -12,6 +12,8 @@ const client = window.supabaseClient;
 let allMaintenance = [];
 let allEquipment = [];
 let allTechnicians = [];
+let allDamageRecords = [];
+
 
 let currentUser = null;
 let currentProfile = null;
@@ -72,6 +74,10 @@ const equipmentUsableInput =
 const durationPreview =
     document.getElementById("durationPreview");
 
+const damageRecordSelect =
+    document.getElementById("damageRecordId");
+
+
 // =========================================
 // INITIALIZE
 // =========================================
@@ -104,6 +110,7 @@ async function initializeMaintenancePage() {
 
         await loadEquipment();
         await loadTechnicians();
+        await loadDamageRecords();
         await loadMaintenance();
 
         applyRolePermissions();
@@ -264,6 +271,110 @@ function populateTechnicianSelect() {
         select.disabled = false;
     }
 }
+
+
+// =========================================
+// LOAD DAMAGE REPORTS
+// =========================================
+
+async function loadDamageRecords() {
+    let query = client
+        .from("damage_records")
+        .select(`
+            id,
+            equipment_id,
+            damage_type,
+            status,
+            assigned_to,
+            equipment:equipment_id (
+                id,
+                code,
+                name
+            )
+        `)
+        .eq("status", "diproses")
+        .order("damage_date", {
+            ascending: false
+        });
+
+    // Technician hanya melihat laporan
+    // yang menjadi tanggung jawabnya.
+    if (currentProfile?.role === "technician") {
+        query = query.eq(
+            "assigned_to",
+            currentUser.id
+        );
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+        console.error(
+            "Damage reports error:",
+            error
+        );
+
+        throw error;
+    }
+
+    allDamageRecords = data || [];
+
+    populateDamageRecordSelect();
+}
+
+
+// =========================================
+// DAMAGE REPORT CHANGE EVENT
+// =========================================
+
+damageRecordSelect.addEventListener("change", () => {
+    const damageId = damageRecordSelect.value;
+
+    if (!damageId) {
+        document.getElementById("equipmentId").disabled = false;
+        return;
+    }
+
+    const selectedReport = allDamageRecords.find(
+        item => item.id === damageId
+    );
+
+    if (!selectedReport) return;
+
+    const equipmentSelect =
+        document.getElementById("equipmentId");
+
+    equipmentSelect.value =
+        selectedReport.equipment_id;
+
+    // Equipment mengikuti laporan yang dipilih.
+    equipmentSelect.disabled = true;
+});
+
+
+// =========================================
+// DAMAGE REPORT SELECT
+// =========================================
+
+function populateDamageRecordSelect() {
+    damageRecordSelect.innerHTML = `
+        <option value="">
+            Tidak terkait laporan kerusakan
+        </option>
+    `;
+
+    allDamageRecords.forEach(item => {
+        const option = document.createElement("option");
+
+        option.value = item.id;
+
+        option.textContent =
+            `${item.equipment?.code || "-"} - ${item.damage_type}`;
+
+        damageRecordSelect.appendChild(option);
+    });
+}
+
 
 // =========================================
 // LOAD MAINTENANCE
@@ -780,6 +891,10 @@ function openAddModal() {
     modalTitle.textContent = "Tambah Maintenance";
 
     maintenanceForm.reset();
+
+    damageRecordSelect.value = "";
+
+    document.getElementById("equipmentId").disabled = false;
 
     const now = new Date();
 
