@@ -485,61 +485,61 @@ function renderDamageRecords(
 
                             <td>
 
-                                <div class="table-actions">
+                                
+<div class="table-actions">
 
-                                    <button
-                                        type="button"
-                                        class="action-button view"
-                                        onclick="viewDamage('${item.id}')"
-                                        title="Lihat Detail"
-                                    >
-                                        👁
-                                    </button>
+    <button
+        type="button"
+        class="action-button view"
+        onclick="viewDamage('${item.id}')"
+        title="Lihat Detail"
+    >
+        👁
+    </button>
 
-                                    ${
-                                        isAdmin
-                                            ? `
+    ${
+        currentProfile?.role === "technician" &&
+        item.status === "dilaporkan" &&
+        !item.assigned_to
+            ? `
+                <button
+                    type="button"
+                    class="action-button edit"
+                    onclick="takeDamageReport('${item.id}')"
+                    title="Ambil Laporan"
+                >
+                    Ambil
+                </button>
+            `
+            : ""
+    }
 
-                                                                                                
-                                                ${
-                                                    currentProfile?.role === "technician" &&
-                                                    item.status === "dilaporkan" &&
-                                                    !item.assigned_to
-                                                        ? `
-                                                            <button
-                                                                type="button"
-                                                                class="action-button edit"
-                                                                onclick="takeDamageReport('${item.id}')"
-                                                                title="Ambil Laporan"
-                                                            >
-                                                                Ambil
-                                                            </button>
-                                                        `
-                                                        : ""
-                                                }
-                         
-                                                <button
-                                                    type="button"
-                                                    class="action-button edit"
-                                                    onclick="editDamage('${item.id}')"
-                                                    title="Edit"
-                                                >
-                                                    ✎
-                                                </button>
+    ${
+        isAdmin
+            ? `
+                <button
+                    type="button"
+                    class="action-button edit"
+                    onclick="editDamage('${item.id}')"
+                    title="Edit"
+                >
+                    ✎
+                </button>
 
-                                                <button
-                                                    type="button"
-                                                    class="action-button delete"
-                                                    onclick="deleteDamage('${item.id}')"
-                                                    title="Hapus"
-                                                >
-                                                    🗑
-                                                </button>
-                                            `
-                                            : ""
-                                    }
+                <button
+                    type="button"
+                    class="action-button delete"
+                    onclick="deleteDamage('${item.id}')"
+                    title="Hapus"
+                >
+                    🗑
+                </button>
+            `
+            : ""
+    }
 
-                                </div>
+</div>
+
 
                             </td>
 
