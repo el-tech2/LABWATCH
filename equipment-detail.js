@@ -348,14 +348,14 @@ function renderMaintenanceHistory() {
     
 const latestRecord = maintenanceHistory[0];
 
-const lastMaintenanceDate = latestRecord
-    ? latestRecord.maintenance_date
-    : equipment.last_maintenance_date;
+    const lastMaintenanceDate = latestRecord
+        ? latestRecord.maintenance_date
+        : equipment.last_maintenance_date;
 
-document.getElementById("lastServiceDate").textContent =
-    lastMaintenanceDate
-        ? formatDate(lastMaintenanceDate)
-        : "Belum ada";
+    document.getElementById("lastServiceDate").textContent =
+        lastMaintenanceDate
+            ? formatDate(lastMaintenanceDate)
+            : "Belum ada";
 
 
 
