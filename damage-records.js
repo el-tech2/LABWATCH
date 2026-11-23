@@ -514,30 +514,7 @@ function renderDamageRecords(
             : ""
     }
 
-    ${
-        isAdmin
-            ? `
-                <button
-                    type="button"
-                    class="action-button edit"
-                    onclick="editDamage('${item.id}')"
-                    title="Edit"
-                >
-                    ✎
-                </button>
-
-                <button
-                    type="button"
-                    class="action-button delete"
-                    onclick="deleteDamage('${item.id}')"
-                    title="Hapus"
-                >
-                    🗑
-                </button>
-            `
-            : ""
-    }
-
+   
 </div>
 
 
@@ -770,7 +747,12 @@ function openAddModal() {
 
 function editDamage(
     damageId
-) {
+) {     showMessage(
+        "Damage Record tidak dapat diedit melalui halaman ini.",
+        "error"
+    );
+
+    return;
 
     const item =
         allDamageRecords.find(
@@ -1069,7 +1051,12 @@ async function saveDamage(event) {
 
 async function deleteDamage(
     damageId
-) {
+) {     showMessage(
+        "Damage Record tidak dapat dihapus.",
+        "error"
+    );
+
+    return;
 
     if (
         currentProfile?.role !== "admin"
