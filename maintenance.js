@@ -614,20 +614,20 @@ const canDelete =
     </button>
 
     ${
-        canEdit
-            ? `
-                <button
-                    type="button"
-                    class="action-button edit"
-                    onclick="editMaintenance('${item.id}')"
-                    title="Edit"
-                >
-                    ✎
-                </button>
-            `
-            : ""
-    }
-
+    currentProfile?.role === "technician" &&
+    item.technician_id === currentUser.id
+        ? `
+            <button
+                type="button"
+                class="action-button edit"
+                onclick="editMaintenance('${item.id}')"
+                title="Edit"
+            >
+                ✎
+            </button>
+        `
+        : ""
+}
     ${
         canDelete
             ? `
@@ -880,16 +880,13 @@ function updateDurationPreview() {
 // =========================================
 
 function openAddModal() {
-    if (
-        currentProfile?.role !== "admin" &&
-        currentProfile?.role !== "technician"
-    ) {
-        showMessage(
-            "Kamu tidak memiliki izin.",
-            "error"
-        );
-        return;
-    }
+    if (currentProfile?.role !== "technician") {
+    showMessage(
+        "Hanya Technician yang dapat menambahkan maintenance.",
+        "error"
+    );
+    return;
+}
 
     editingMaintenanceId = null;
 
@@ -941,17 +938,33 @@ function openAddModal() {
 
 
 function editMaintenance(maintenanceId) {
-    const item = allMaintenance.find(
-        record => String(record.id) === String(maintenanceId)
+   if (currentProfile?.role !== "technician") {
+    showMessage(
+        "Admin hanya dapat melihat detail maintenance.",
+        "error"
     );
+    return;
+}
 
-    if (!item) {
-        showMessage(
-            "Data maintenance tidak ditemukan.",
-            "error"
-        );
-        return;
-    }
+const item = allMaintenance.find(
+    record => String(record.id) === String(maintenanceId)
+);
+
+if (!item) {
+    showMessage(
+        "Data maintenance tidak ditemukan.",
+        "error"
+    );
+    return;
+}
+
+if (item.technician_id !== currentUser.id) {
+    showMessage(
+        "Kamu hanya dapat mengedit maintenance milikmu sendiri.",
+        "error"
+    );
+    return;
+}
 
     // Admin boleh mengedit semua riwayat.
     // Teknisi hanya boleh mengedit riwayat miliknya.
@@ -1112,16 +1125,13 @@ async function saveMaintenance(event) {
     }
 }
 
-    if (
-        currentProfile?.role !== "admin" &&
-        currentProfile?.role !== "technician"
-    ) {
-        showMessage(
-            "Kamu tidak memiliki izin.",
-            "error"
-        );
-        return;
-    }
+    if (currentProfile?.role !== "technician") {
+    showMessage(
+        "Hanya Technician yang dapat menambahkan atau memperbarui maintenance.",
+        "error"
+    );
+    return;
+}
 
     const equipmentId =
         document.getElementById("equipmentId").value;
@@ -1310,7 +1320,13 @@ async function saveMaintenance(event) {
 // DELETE MAINTENANCE
 // =========================================
 
-async function deleteMaintenance(maintenanceId) {
+async function deleteMaintenance(maintenanceId) { 
+    showMessage(
+    "Maintenance record tidak dapat dihapus.",
+    "error"
+);
+return;
+    
     if (currentProfile?.role !== "admin") {
         showMessage(
             "Hanya Admin yang dapat menghapus maintenance.",
@@ -1477,8 +1493,12 @@ document
 // =========================================
 
 function applyRolePermissions() {
-    // Admin dan Technician boleh menambah maintenance.
-    addMaintenanceButton.style.display = "inline-flex";
+    const isTechnician =
+        currentProfile?.role === "technician";
+
+    // Hanya Technician yang boleh menambahkan maintenance.
+    addMaintenanceButton.style.display =
+        isTechnician ? "inline-flex" : "none";
 }
 
 // =========================================
