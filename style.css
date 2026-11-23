@@ -4014,3 +4014,121 @@ body {
     }
 
 }
+
+
+/* =========================================
+   DAMAGE DETAIL PAGE
+========================================= */
+
+.damage-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 28px;
+    margin-bottom: 22px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+.damage-detail-header h2 {
+    color: #0f172a;
+    font-size: 24px;
+    margin: 8px 0;
+}
+
+.damage-detail-header p {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.damage-detail-card {
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.damage-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.damage-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.damage-info-item span,
+.damage-assignee span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.damage-info-item strong {
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.damage-assignee {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.assignee-avatar {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-weight: 800;
+}
+
+.damage-assignee strong,
+.damage-assignee small {
+    display: block;
+    margin-top: 5px;
+}
+
+.damage-assignee strong {
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.damage-assignee small {
+    color: #64748b;
+    font-size: 11px;
+}
+
+.damage-description {
+    color: #334155;
+    font-size: 14px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 700px) {
+
+    .damage-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .damage-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .main-content {
+        padding: 22px 18px;
+    }
+}
