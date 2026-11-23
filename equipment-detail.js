@@ -345,16 +345,18 @@ function renderMaintenanceHistory() {
     // Gunakan tanggal dari riwayat maintenance jika tersedia.
     // Jika belum ada riwayat, gunakan tanggal lama dari equipment.
 
-    const latestRecord = maintenanceHistory[0];
+    
+const latestRecord = maintenanceHistory[0];
 
-    const lastMaintenanceDate = latestRecord
-        ? latestRecord.maintenance_date
-        : equipment.last_maintenance_date;
+const lastMaintenanceDate = latestRecord
+    ? latestRecord.maintenance_date
+    : equipment.last_maintenance_date;
 
-    document.getElementById("lastServiceDate")
-        .textContent = lastMaintenanceDate
-            ? formatDate(lastMaintenanceDate)
-            : "Belum ada";
+document.getElementById("lastServiceDate").textContent =
+    lastMaintenanceDate
+        ? formatDate(lastMaintenanceDate)
+        : "Belum ada";
+
 
 
     // Empty history
