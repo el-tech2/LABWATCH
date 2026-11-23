@@ -4132,3 +4132,159 @@ body {
         padding: 22px 18px;
     }
 }
+
+
+/* =========================================
+   MAINTENANCE DETAIL PAGE
+========================================= */
+
+.maintenance-detail-back {
+    margin-bottom: 20px;
+}
+
+.maintenance-detail-back a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.maintenance-detail-back a:hover {
+    text-decoration: underline;
+}
+
+.maintenance-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 28px;
+    margin-bottom: 22px;
+
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+.detail-label {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.maintenance-detail-header h2 {
+    margin: 10px 0 5px;
+    color: #0f172a;
+    font-size: 25px;
+}
+
+.maintenance-detail-header p {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.maintenance-duration-badge {
+    padding: 10px 15px;
+    border-radius: 20px;
+
+    background: #eff6ff;
+    color: #1d4ed8;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.detail-section {
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.detail-section-header {
+    margin-bottom: 22px;
+}
+
+.detail-section-header h3 {
+    color: #0f172a;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.detail-section-header p {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.maintenance-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.detail-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-info-item span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.detail-info-item strong {
+    color: #0f172a;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.detail-description {
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
+
+.detail-condition {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    margin-top: 22px;
+    padding: 16px;
+
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+.detail-condition span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.detail-condition strong {
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.detail-loading {
+    padding: 30px;
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+
+    .maintenance-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .maintenance-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
