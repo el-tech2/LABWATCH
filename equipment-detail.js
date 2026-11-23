@@ -340,13 +340,22 @@ function renderMaintenanceHistory() {
     document.getElementById("maintenanceHistoryCount")
         .textContent = `${totalCount} records`;
 
+    
     // Summary: latest maintenance date
+    // Gunakan tanggal dari riwayat maintenance jika tersedia.
+    // Jika belum ada riwayat, gunakan tanggal lama dari equipment.
+
     const latestRecord = maintenanceHistory[0];
 
+    const lastMaintenanceDate = latestRecord
+        ? latestRecord.maintenance_date
+        : equipment.last_maintenance_date;
+
     document.getElementById("lastServiceDate")
-        .textContent = latestRecord
-            ? formatDate(latestRecord.maintenance_date)
+        .textContent = lastMaintenanceDate
+            ? formatDate(lastMaintenanceDate)
             : "Belum ada";
+
 
     // Empty history
     if (totalCount === 0) {
