@@ -1052,46 +1052,20 @@ window.editMaintenance = editMaintenance;
 // VIEW MAINTENANCE
 // =========================================
 
+
+// =========================================
+// VIEW MAINTENANCE
+// =========================================
+
 function viewMaintenance(maintenanceId) {
-    const item = allMaintenance.find(
-        record => String(record.id) === String(maintenanceId)
-    );
 
-    if (!item) return;
+    window.location.href =
+        `maintenance-detail.html?id=${encodeURIComponent(maintenanceId)}`;
 
-    const equipment =
-        item.equipment?.code || "Equipment";
-
-    const equipmentName =
-        item.equipment?.name || "-";
-
-    const technician =
-        item.technician?.full_name || "-";
-
-    const duration = getDurationText(item);
-
-    const equipmentCondition =
-        getEquipmentConditionText(item.equipment_usable);
-
-    alert(
-        `MAINTENANCE RECORD\n\n` +
-        `Equipment: ${equipment}\n` +
-        `Nama Barang: ${equipmentName}\n` +
-        `Tanggal Maintenance: ${formatDate(item.maintenance_date)}\n` +
-        `Jenis: ${formatMaintenanceType(item.maintenance_type)}\n` +
-        `Teknisi: ${technician}\n\n` +
-
-        `Waktu Mulai: ${formatDateTime(item.started_at)}\n` +
-        `Waktu Selesai: ${formatDateTime(item.completed_at)}\n` +
-        `Durasi: ${duration}\n\n` +
-
-        `Deskripsi:\n${item.description || "-"}\n\n` +
-        `Hasil:\n${item.result || "-"}\n` +
-        `Kondisi Alat: ${equipmentCondition}\n\n` +
-
-        `Maintenance Berikutnya: ${formatDate(item.next_maintenance_date)}`
-    );
 }
+
+window.viewMaintenance = viewMaintenance;
+
 
 window.viewMaintenance = viewMaintenance;
 
