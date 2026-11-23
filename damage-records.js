@@ -844,38 +844,14 @@ window.editDamage =
 // VIEW
 // =========================================
 
-function viewDamage(
-    damageId
-) {
+function viewDamage(damageId) {
 
-    const item =
-        allDamageRecords.find(
-            record =>
-                String(record.id) ===
-                String(damageId)
-        );
-
-
-    if (!item) {
-        return;
-    }
-
-
-    alert(
-        `Equipment: ${item.equipment?.name || "-"}\n\n` +
-        `Tanggal: ${formatDate(item.damage_date)}\n` +
-        `Kerusakan: ${item.damage_type}\n` +
-        `Severity: ${formatSeverity(item.severity)}\n` +
-        `Status: ${formatDamageStatus(item.status)}\n\n` +
-        `Deskripsi:\n${item.description || "-"}\n\n` +
-        `Tindakan:\n${item.action_taken || "-"}`
-    );
+    window.location.href =
+        `damage-detail.html?id=${encodeURIComponent(damageId)}`;
 
 }
 
-
-window.viewDamage =
-    viewDamage;
+window.viewDamage = viewDamage;
 
 
 // =========================================
