@@ -803,69 +803,38 @@ window.viewDamage =
 // SAVE
 // =========================================
 
-async function saveDamage(
-    event
-) {
+
+async function saveDamage(event) {
 
     event.preventDefault();
 
-
     const equipmentId =
-        document.getElementById(
-            "equipmentId"
-        ).value;
-
+        document.getElementById("equipmentId").value;
 
     const damageDate =
-        document.getElementById(
-            "damageDate"
-        ).value;
-
+        document.getElementById("damageDate").value;
 
     const damageType =
-        document.getElementById(
-            "damageType"
-        ).value
-            .trim();
-
+        document.getElementById("damageType").value.trim();
 
     const severity =
-        document.getElementById(
-            "severity"
-        ).value;
-
+        document.getElementById("severity").value;
 
     const description =
-        document.getElementById(
-            "description"
-        ).value
-            .trim();
+        document.getElementById("description").value.trim();
 
 
-    const actionTaken =
-        document.getElementById(
-            "actionTaken"
-        ).value
-            .trim();
-
-
-    const status =
-        document.getElementById(
-            "damageStatus"
-        ).value;
-
-
+    // Validasi data laporan
     if (
         !equipmentId ||
         !damageDate ||
         !damageType ||
         !severity ||
-        !description ||
-        !status
+        !description
     ) {
 
         showMessage(
-            "Field yang bertanda * wajib diisi.",
+            "Lengkapi seluruh informasi kerusakan.",
             "error"
         );
 
@@ -873,38 +842,25 @@ async function saveDamage(
     }
 
 
+    // Data utama laporan
     const damageData = {
 
-        equipment_id:
-            equipmentId,
+        equipment_id: equipmentId,
 
-        damage_date:
-            damageDate,
+        damage_date: damageDate,
 
-        damage_type:
-            damageType,
+        damage_type: damageType,
 
-        severity:
-            severity,
+        severity: severity,
 
-        description:
-            description,
-
-        action_taken:
-            actionTaken || null,
-
-        status:
-            status
+        description: description
 
     };
 
 
-    saveDamageButton.disabled =
-        true;
+    saveDamageButton.disabled = true;
 
-
-    saveDamageButton.textContent =
-        "Menyimpan...";
+    saveDamageButton.textContent = "Menyimpan...";
 
 
     try {
@@ -914,32 +870,37 @@ async function saveDamage(
 
         if (editingDamageId) {
 
-            ({
-                error
-            } = await client
+            // Edit hanya memperbarui informasi kerusakan.
+            // Status dan tindakan tidak diubah.
+
+            ({ error } = await client
                 .from("damage_records")
-                .update(
-                    damageData
-                )
-                .eq(
-                    "id",
-                    editingDamageId
-                ));
+                .update(damageData)
+                .eq("id", editingDamageId));
 
         }
 
         else {
 
-            ({
-                error
-            } = await client
+            // Laporan baru otomatis berstatus Dilaporkan.
+
+            ({ error } = await client
                 .from("damage_records")
                 .insert({
 
                     ...damageData,
 
-                    reported_by:
-                        currentUser.id
+                    reported_by: currentUser.id,
+
+                    status: "dilaporkan",
+
+                    action_taken: null,
+
+                    assigned_to: null,
+
+                    assigned_at: null,
+
+                    completed_at: null
 
                 }));
 
@@ -953,7 +914,6 @@ async function saveDamage(
                 error
             );
 
-
             showMessage(
                 error.message,
                 "error"
@@ -965,27 +925,28 @@ async function saveDamage(
 
         showMessage(
             editingDamageId
-                ? "Damage record berhasil diperbarui."
-                : "Damage record berhasil ditambahkan.",
+                ? "Informasi kerusakan berhasil diperbarui."
+                : "Laporan kerusakan berhasil dibuat. Status: Dilaporkan.",
             "success"
         );
 
 
         closeModal();
 
-
         await loadDamageRecords();
+
 
     }
 
     catch (error) {
 
         console.error(
+            "Save damage error:",
             error
         );
 
         showMessage(
-            "Terjadi kesalahan saat menyimpan data.",
+            "Terjadi kesalahan saat menyimpan laporan.",
             "error"
         );
 
@@ -993,8 +954,7 @@ async function saveDamage(
 
     finally {
 
-        saveDamageButton.disabled =
-            false;
+        saveDamageButton.disabled = false;
 
         saveDamageButton.textContent =
             editingDamageId
