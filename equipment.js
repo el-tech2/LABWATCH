@@ -609,3 +609,293 @@ async function saveEquipment(event) {
         setSaveLoading(false);
     }
 }
+
+// =========================================
+// DELETE EQUIPMENT
+// =========================================
+
+async function deleteEquipment(equipmentId) {
+    if (currentProfile?.role !== "admin") {
+        showMessage(
+            "Hanya Admin yang dapat menghapus equipment.",
+            "error"
+        );
+        return;
+    }
+
+    const equipment = allEquipment.find(
+        item => String(item.id) === String(equipmentId)
+    );
+
+    if (!equipment) return;
+
+    const confirmed = confirm(
+        `Hapus equipment "${equipment.name}" (${equipment.code})?`
+    );
+
+    if (!confirmed) return;
+
+    // Barang yang sedang dalam perbaikan tidak boleh dihapus.
+    if (equipment.status === "dalam_perbaikan") {
+        showMessage(
+            "Equipment sedang dalam perbaikan dan tidak boleh dihapus.",
+            "error"
+        );
+        return;
+    }
+
+    try {
+        const { error } = await client
+            .from("equipment")
+            .delete()
+            .eq("id", equipmentId);
+
+        if (error) {
+            console.error("Delete error:", error);
+
+            showMessage(
+                getDatabaseErrorMessage(error),
+                "error"
+            );
+            return;
+        }
+
+        showMessage(
+            "Equipment berhasil dihapus.",
+            "success"
+        );
+
+        await loadEquipment();
+        populateCategoryFilter();
+        applyFilters();
+
+    } catch (error) {
+        console.error("Delete equipment error:", error);
+
+        showMessage(
+            "Terjadi kesalahan saat menghapus equipment.",
+            "error"
+        );
+    }
+}
+
+window.deleteEquipment = deleteEquipment;
+
+// =========================================
+// MODAL CLOSE
+// =========================================
+
+function closeModal() {
+    equipmentModal.classList.add("hidden");
+
+    equipmentForm.reset();
+
+    const equipmentTypeInput =
+        document.getElementById("equipmentType");
+
+    if (equipmentTypeInput) {
+        equipmentTypeInput.disabled = false;
+    }
+
+    editingEquipmentId = null;
+}
+
+closeModalButton.addEventListener("click", closeModal);
+cancelModalButton.addEventListener("click", closeModal);
+
+// Klik area luar modal.
+equipmentModal.addEventListener("click", function(event) {
+    if (event.target === equipmentModal) {
+        closeModal();
+    }
+});
+
+// =========================================
+// FILTER EVENTS
+// =========================================
+
+searchInput.addEventListener("input", applyFilters);
+categoryFilter.addEventListener("change", applyFilters);
+conditionFilter.addEventListener("change", applyFilters);
+statusFilter.addEventListener("change", applyFilters);
+
+resetFilterButton.addEventListener("click", function() {
+    searchInput.value = "";
+    categoryFilter.value = "";
+    conditionFilter.value = "";
+    statusFilter.value = "";
+
+    renderEquipment(allEquipment);
+});
+
+// =========================================
+// ADD BUTTON
+// =========================================
+
+addEquipmentButton.addEventListener("click", openAddModal);
+
+// =========================================
+// FORM SUBMIT
+// =========================================
+
+equipmentForm.addEventListener("submit", saveEquipment);
+
+// =========================================
+// LOGOUT
+// =========================================
+
+document
+    .getElementById("logoutButton")
+    .addEventListener("click", async function() {
+        const confirmed = confirm(
+            "Apakah kamu yakin ingin logout?"
+        );
+
+        if (!confirmed) return;
+
+        await client.auth.signOut();
+
+        window.location.href = "index.html";
+    });
+
+// =========================================
+// UI HELPERS
+// =========================================
+
+function formatCondition(condition) {
+    switch (condition) {
+        case "baik":
+            return "Baik";
+
+        case "cukup":
+            return "Cukup";
+
+        case "buruk":
+            return "Buruk";
+
+        default:
+            return condition || "-";
+    }
+}
+
+function getConditionClass(condition) {
+    switch (condition) {
+        case "baik":
+            return "good";
+
+        case "cukup":
+            return "fair";
+
+        case "buruk":
+            return "poor";
+
+        default:
+            return "";
+    }
+}
+
+function formatStatus(status) {
+    switch (status) {
+        case "aktif":
+            return "Aktif";
+
+        case "dalam_perbaikan":
+            return "Dalam Perbaikan";
+
+        case "nonaktif":
+            return "Nonaktif";
+
+        default:
+            return status || "-";
+    }
+}
+
+function getStatusClass(status) {
+    switch (status) {
+        case "aktif":
+            return "active";
+
+        case "dalam_perbaikan":
+            return "maintenance";
+
+        case "nonaktif":
+            return "inactive";
+
+        default:
+            return "";
+    }
+}
+
+// =========================================
+// LOADING BUTTON
+// =========================================
+
+function setSaveLoading(loading) {
+    if (loading) {
+        saveEquipmentButton.disabled = true;
+        saveEquipmentButton.textContent = "Menyimpan...";
+    } else {
+        saveEquipmentButton.disabled = false;
+
+        saveEquipmentButton.textContent =
+            editingEquipmentId
+                ? "Simpan Perubahan"
+                : "Simpan Equipment";
+    }
+}
+
+// =========================================
+// MESSAGE
+// =========================================
+
+function showMessage(message, type) {
+    pageMessage.textContent = message;
+    pageMessage.className = `page-message ${type}`;
+
+    setTimeout(() => {
+        pageMessage.classList.add("hidden");
+    }, 4000);
+}
+
+// =========================================
+// DATABASE ERROR
+// =========================================
+
+function getDatabaseErrorMessage(error) {
+    if (error?.code === "23505") {
+        return "Kode equipment sudah digunakan. Silakan coba lagi.";
+    }
+
+    if (error?.code === "42501") {
+        return "Kamu tidak memiliki izin untuk melakukan tindakan ini.";
+    }
+
+    if (error?.message) {
+        return error.message;
+    }
+
+    return "Terjadi kesalahan pada database.";
+}
+
+// =========================================
+// SECURITY
+// =========================================
+
+function escapeHtml(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// =========================================
+// START
+// =========================================
+
+initializeEquipmentPage();
