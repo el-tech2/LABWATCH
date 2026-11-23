@@ -66,6 +66,9 @@ const startedAtInput =
 const completedAtInput =
     document.getElementById("completedAt");
 
+const equipmentUsableInput =
+    document.getElementById("equipmentUsable");
+
 const durationPreview =
     document.getElementById("durationPreview");
 
@@ -347,6 +350,7 @@ function renderOverview() {
         overdue;
 }
 
+
 // =========================================
 // FILTER
 // =========================================
@@ -420,6 +424,9 @@ function renderMaintenance(maintenanceList) {
 
             const duration = getDurationText(item);
 
+            const equipmentCondition =
+                getEquipmentConditionText(item.equipment_usable);
+
             return `
                 <tr>
                     <td>${index + 1}</td>
@@ -454,7 +461,12 @@ function renderMaintenance(maintenanceList) {
                     </td>
 
                     <td>
-                        ${escapeHtml(item.result || "-")}
+                        <div>
+                            ${escapeHtml(item.result || "-")}
+                            <small style="display:block; margin-top:4px;">
+                                ${escapeHtml(equipmentCondition)}
+                            </small>
+                        </div>
                     </td>
 
                     <td>
@@ -505,6 +517,22 @@ function renderMaintenance(maintenanceList) {
             `;
         })
         .join("");
+}
+
+// =========================================
+// EQUIPMENT CONDITION TEXT
+// =========================================
+
+function getEquipmentConditionText(value) {
+    if (value === true) {
+        return "Kondisi: Bisa digunakan kembali";
+    }
+
+    if (value === false) {
+        return "Kondisi: Tidak bisa digunakan";
+    }
+
+    return "Kondisi setelah servis: Belum ditentukan";
 }
 
 // =========================================
@@ -714,6 +742,7 @@ function updateDurationPreview() {
         `Total durasi servis: ${duration}`;
 }
 
+
 // =========================================
 // OPEN ADD MODAL
 // =========================================
@@ -746,7 +775,10 @@ function openAddModal() {
     startedAtInput.value = localNow;
     completedAtInput.value = "";
 
+    equipmentUsableInput.value = "";
+
     startedAtInput.required = true;
+    equipmentUsableInput.required = false;
 
     document.getElementById("equipmentId").disabled = false;
     document.getElementById("maintenanceType").disabled = false;
@@ -823,8 +855,18 @@ function editMaintenance(maintenanceId) {
     completedAtInput.value =
         toDateTimeLocal(item.completed_at);
 
+    equipmentUsableInput.value =
+        item.equipment_usable === true
+            ? "true"
+            : item.equipment_usable === false
+                ? "false"
+                : "";
+
     // Data lama boleh tetap kosong.
     startedAtInput.required = !item.started_at;
+
+    equipmentUsableInput.required =
+        Boolean(item.completed_at);
 
     document.getElementById("equipmentId").disabled = false;
     document.getElementById("maintenanceType").disabled = false;
@@ -862,6 +904,9 @@ function viewMaintenance(maintenanceId) {
 
     const duration = getDurationText(item);
 
+    const equipmentCondition =
+        getEquipmentConditionText(item.equipment_usable);
+
     alert(
         `MAINTENANCE RECORD\n\n` +
         `Equipment: ${equipment}\n` +
@@ -875,7 +920,8 @@ function viewMaintenance(maintenanceId) {
         `Durasi: ${duration}\n\n` +
 
         `Deskripsi:\n${item.description || "-"}\n\n` +
-        `Hasil:\n${item.result || "-"}\n\n` +
+        `Hasil:\n${item.result || "-"}\n` +
+        `Kondisi Alat: ${equipmentCondition}\n\n` +
 
         `Maintenance Berikutnya: ${formatDate(item.next_maintenance_date)}`
     );
@@ -925,6 +971,10 @@ async function saveMaintenance(event) {
     const startedAtValue = startedAtInput.value;
     const completedAtValue = completedAtInput.value;
 
+    const equipmentUsableValue =
+        equipmentUsableInput.value;
+
+    // Validasi field wajib.
     if (
         !equipmentId ||
         !maintenanceDate ||
@@ -938,7 +988,7 @@ async function saveMaintenance(event) {
         return;
     }
 
-    // Catatan baru wajib mempunyai waktu mulai.
+    // Catatan baru wajib memiliki waktu mulai.
     if (!editingMaintenanceId && !startedAtValue) {
         showMessage(
             "Waktu mulai servis wajib diisi.",
@@ -947,9 +997,28 @@ async function saveMaintenance(event) {
         return;
     }
 
+    // Waktu selesai harus memiliki waktu mulai.
     if (completedAtValue && !startedAtValue) {
         showMessage(
             "Waktu mulai harus diisi sebelum waktu selesai.",
+            "error"
+        );
+        return;
+    }
+
+    // Jika servis selesai, kondisi alat wajib ditentukan.
+    if (completedAtValue && !equipmentUsableValue) {
+        showMessage(
+            "Pilih kondisi alat setelah maintenance selesai.",
+            "error"
+        );
+        return;
+    }
+
+    // Jika servis belum selesai, kondisi harus kosong.
+    if (!completedAtValue && equipmentUsableValue) {
+        showMessage(
+            "Kosongkan kondisi alat jika servis masih berlangsung.",
             "error"
         );
         return;
@@ -961,11 +1030,13 @@ async function saveMaintenance(event) {
     try {
         startedAt = toDatabaseDateTime(startedAtValue);
         completedAt = toDatabaseDateTime(completedAtValue);
+
     } catch (error) {
         showMessage(error.message, "error");
         return;
     }
 
+    // Validasi urutan waktu.
     if (
         startedAt &&
         completedAt &&
@@ -991,8 +1062,15 @@ async function saveMaintenance(event) {
         technician_id: selectedTechnicianId,
         started_at: startedAt,
         completed_at: completedAt,
+
+        // Simpan hasil kondisi alat.
+        equipment_usable: completedAt
+            ? equipmentUsableValue === "true"
+            : null,
+
         description: description || null,
         result: result || null,
+
         next_maintenance_date:
             nextMaintenanceDate || null
     };
@@ -1026,20 +1104,8 @@ async function saveMaintenance(event) {
             );
         }
 
-        // Perbarui tanggal maintenance terakhir equipment.
-        const { error: equipmentError } = await client
-            .from("equipment")
-            .update({
-                last_maintenance_date: maintenanceDate
-            })
-            .eq("id", equipmentId);
-
-        if (equipmentError) {
-            console.error(
-                "Update equipment date error:",
-                equipmentError
-            );
-        }
+        // Perbarui tanggal maintenance terakhir.
+        
 
         closeModal();
 
@@ -1062,6 +1128,7 @@ async function saveMaintenance(event) {
         setSaveLoading(false);
     }
 }
+
 
 // =========================================
 // DELETE MAINTENANCE
@@ -1126,6 +1193,7 @@ function closeModal() {
     editingMaintenanceId = null;
 
     startedAtInput.required = true;
+    equipmentUsableInput.required = false;
 
     document.getElementById("technicianId").disabled =
         currentProfile?.role === "technician";
@@ -1180,7 +1248,16 @@ startedAtInput.addEventListener(
 
 completedAtInput.addEventListener(
     "input",
-    updateDurationPreview
+    () => {
+        equipmentUsableInput.required =
+            Boolean(completedAtInput.value);
+
+        if (!completedAtInput.value) {
+            equipmentUsableInput.value = "";
+        }
+
+        updateDurationPreview();
+    }
 );
 
 // =========================================
@@ -1291,7 +1368,7 @@ function getDatabaseErrorMessage(error) {
     }
 
     if (error?.code === "23514") {
-        return "Waktu selesai tidak boleh lebih awal dari waktu mulai.";
+        return "Waktu selesai tidak boleh lebih awal dari waktu mulai atau kondisi alat belum sesuai.";
     }
 
     if (error?.message) {
