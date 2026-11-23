@@ -1,3 +1,4 @@
+
 // =========================================
 // LABWATCH - DASHBOARD
 // =========================================
@@ -12,20 +13,19 @@ const client = window.supabaseClient;
 async function checkAuthentication() {
 
     const {
-        data: {
-            session
-        }
+        data: { session },
+        error
     } = await client.auth.getSession();
 
-
-    if (!session) {
-
-        window.location.href =
-            "index.html";
-
+    if (error) {
+        console.error("Session error:", error);
         return null;
     }
 
+    if (!session) {
+        window.location.href = "index.html";
+        return null;
+    }
 
     return session;
 }
@@ -37,57 +37,36 @@ async function checkAuthentication() {
 
 async function loadProfile(userId) {
 
-    const {
-        data,
-        error
-    } = await client
+    const { data, error } = await client
         .from("profiles")
         .select("*")
         .eq("id", userId)
         .single();
 
-
     if (error) {
-
-        console.error(
-            "Profile error:",
-            error
-        );
-
+        console.error("Profile error:", error);
         return;
     }
 
+    if (!data) return;
 
-    if (data) {
+    document.getElementById("userName").textContent =
+        data.full_name;
 
-        document.getElementById(
-            "userName"
-        ).textContent =
-            data.full_name;
+    document.getElementById("userRole").textContent =
+        data.role === "admin"
+            ? "Administrator"
+            : "Technician";
 
+    const initials = data.full_name
+        .split(" ")
+        .map(word => word.charAt(0))
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
 
-        document.getElementById(
-            "userRole"
-        ).textContent =
-            data.role === "admin"
-                ? "Administrator"
-                : "Technician";
-
-
-        // Avatar
-        const initials =
-            data.full_name
-                .split(" ")
-                .map(word => word.charAt(0))
-                .join("")
-                .substring(0, 2)
-                .toUpperCase();
-
-
-        document.querySelector(
-            ".user-avatar"
-        ).textContent = initials;
-    }
+    document.querySelector(".user-avatar").textContent =
+        initials;
 }
 
 
@@ -97,43 +76,24 @@ async function loadProfile(userId) {
 
 async function loadEquipment() {
 
-    const {
-        data,
-        error
-    } = await client
+    const { data, error } = await client
         .from("equipment")
         .select("*")
-        .order(
-            "created_at",
-            {
-                ascending: false
-            }
-        );
-
+        .order("created_at", {
+            ascending: false
+        });
 
     if (error) {
-
-        console.error(
-            "Equipment error:",
-            error
-        );
-
+        console.error("Equipment error:", error);
         return;
     }
 
+    const equipment = data || [];
 
-    if (!data) {
-        return;
-    }
-
-
-    updateStatistics(data);
-
-    updateCondition(data);
-
-    updateRecentEquipment(data);
-
-    updateMaintenance(data);
+    updateStatistics(equipment);
+    updateCondition(equipment);
+    updateRecentEquipment(equipment);
+    updateMaintenance(equipment);
 }
 
 
@@ -143,104 +103,67 @@ async function loadEquipment() {
 
 function updateStatistics(data) {
 
-    const total =
-        data.length;
+    const total = data.length;
 
+    const good = data.filter(
+        item => item.condition === "baik"
+    ).length;
 
-    const good =
-        data.filter(
-            item =>
-                item.condition === "Baik"
-        ).length;
+    const monitor = data.filter(
+        item => item.condition === "cukup"
+    ).length;
 
+    const critical = data.filter(
+        item => item.condition === "buruk"
+    ).length;
 
-    const monitor =
-        data.filter(
-            item =>
-                item.condition === "Cukup"
-        ).length;
+    document.getElementById("totalEquipment").textContent =
+        total;
 
+    document.getElementById("goodEquipment").textContent =
+        good;
 
-    const critical =
-        data.filter(
-            item =>
-                item.condition === "Buruk"
-        ).length;
+    document.getElementById("monitorEquipment").textContent =
+        monitor;
 
-
-    document.getElementById(
-        "totalEquipment"
-    ).textContent = total;
-
-
-    document.getElementById(
-        "goodEquipment"
-    ).textContent = good;
-
-
-    document.getElementById(
-        "monitorEquipment"
-    ).textContent = monitor;
-
-
-    document.getElementById(
-        "criticalEquipment"
-    ).textContent = critical;
+    document.getElementById("criticalEquipment").textContent =
+        critical;
 }
 
 
 // =========================================
-// CONDITION
+// UPDATE CONDITION
 // =========================================
 
 function updateCondition(data) {
 
-    const good =
-        data.filter(
-            item =>
-                item.condition === "Baik"
-        ).length;
+    const good = data.filter(
+        item => item.condition === "baik"
+    ).length;
 
+    const fair = data.filter(
+        item => item.condition === "cukup"
+    ).length;
 
-    const fair =
-        data.filter(
-            item =>
-                item.condition === "Cukup"
-        ).length;
+    const poor = data.filter(
+        item => item.condition === "buruk"
+    ).length;
 
+    const damaged = data.filter(
+        item => item.status === "dalam_perbaikan"
+    ).length;
 
-    const poor =
-        data.filter(
-            item =>
-                item.condition === "Buruk"
-        ).length;
+    document.getElementById("conditionGood").textContent =
+        good;
 
+    document.getElementById("conditionFair").textContent =
+        fair;
 
-    const damaged =
-        data.filter(
-            item =>
-                item.condition === "Dalam_perbaikan"
-        ).length;
+    document.getElementById("conditionPoor").textContent =
+        poor;
 
-
-    document.getElementById(
-        "conditionGood"
-    ).textContent = good;
-
-
-    document.getElementById(
-        "conditionFair"
-    ).textContent = fair;
-
-
-    document.getElementById(
-        "conditionPoor"
-    ).textContent = poor;
-
-
-    document.getElementById(
-        "conditionDamaged"
-    ).textContent = damaged;
+    document.getElementById("conditionDamaged").textContent =
+        damaged;
 }
 
 
@@ -250,15 +173,11 @@ function updateCondition(data) {
 
 function updateRecentEquipment(data) {
 
-    const container =
-        document.getElementById(
-            "recentEquipment"
-        );
+    const container = document.getElementById(
+        "recentEquipment"
+    );
 
-
-    const recent =
-        data.slice(0, 5);
-
+    const recent = data.slice(0, 5);
 
     if (recent.length === 0) {
 
@@ -271,128 +190,163 @@ function updateRecentEquipment(data) {
         return;
     }
 
+    container.innerHTML = recent.map(item => `
 
-    container.innerHTML =
-        recent.map(item => `
+        <div class="recent-item">
 
-            <div class="recent-item">
+            <div class="recent-item-info">
 
-                <div class="recent-item-info">
+                <strong>
+                    ${escapeHtml(item.name)}
+                </strong>
 
-                    <strong>
-                        ${escapeHtml(
-                            item.name
-                        )}
-                    </strong>
-
-                    <span>
-                        ${escapeHtml(
-                            item.code
-                        )}
-                        •
-                        ${escapeHtml(
-                            item.lab_location
-                        )}
-                    </span>
-
-                </div>
-
-                <span
-                    class="condition-badge ${getConditionClass(item.condition)}"
-                >
-                    ${escapeHtml(
-                        item.condition
-                    )}
+                <span>
+                    ${escapeHtml(item.code)}
+                    •
+                    ${escapeHtml(item.lab_location)}
                 </span>
 
             </div>
 
-        `).join("");
+            <span class="condition-badge ${getConditionClass(item.condition)}">
+                ${formatCondition(item.condition)}
+            </span>
+
+        </div>
+
+    `).join("");
 }
 
 
 // =========================================
-// MAINTENANCE
+// UPDATE MAINTENANCE
 // =========================================
 
 function updateMaintenance(data) {
 
-    const active =
-        data.filter(
-            item =>
-                item.status === "Active"
-        ).length;
+    const active = data.filter(
+        item => item.status === "aktif"
+    ).length;
+
+    const maintenance = data.filter(
+        item => item.status === "dalam_perbaikan"
+    ).length;
+
+    const inactive = data.filter(
+        item => item.status === "nonaktif"
+    ).length;
+
+    const today = new Date();
+
+    const maintenanceDue = data.filter(item => {
+
+        if (!item.last_maintenance_date) {
+            return true;
+        }
+
+        const lastMaintenance = new Date(
+            item.last_maintenance_date + "T00:00:00"
+        );
+
+        const difference =
+            today - lastMaintenance;
+
+        const days =
+            difference / (1000 * 60 * 60 * 24);
+
+        return days > 180;
+
+    }).length;
+
+    document.getElementById("activeEquipment").textContent =
+        active;
+
+    document.getElementById("inMaintenance").textContent =
+        maintenance;
+
+    document.getElementById("inactiveEquipment").textContent =
+        inactive;
+
+    document.getElementById("maintenanceDue").textContent =
+        maintenanceDue;
+}
 
 
-    const maintenance =
-        data.filter(
-            item =>
-                item.status === "Maintenance"
-        ).length;
+// =========================================
+// DASHBOARD STAT CARD CLICK
+// =========================================
 
+function setupDashboardCards() {
 
-    const inactive =
-        data.filter(
-            item =>
-                item.status === "Inactive"
-        ).length;
+    const cardConfigurations = [
+        {
+            id: "totalEquipment",
+            filter: "",
+            title: "Total Equipment"
+        },
+        {
+            id: "goodEquipment",
+            filter: "baik",
+            title: "Good Condition"
+        },
+        {
+            id: "monitorEquipment",
+            filter: "cukup",
+            title: "Need Monitoring"
+        },
+        {
+            id: "criticalEquipment",
+            filter: "buruk",
+            title: "Critical"
+        }
+    ];
 
+    cardConfigurations.forEach(config => {
 
-    // Untuk sementara:
-    // equipment yang maintenance terakhirnya
-    // lebih dari 180 hari dianggap due.
+        const valueElement = document.getElementById(
+            config.id
+        );
 
-    const today =
-        new Date();
+        if (!valueElement) return;
 
+        const card = valueElement.closest(".stat-card");
 
-    const maintenanceDue =
-        data.filter(item => {
+        if (!card) return;
 
-            if (!item.last_maintenance_date) {
-                return true;
+        card.style.cursor = "pointer";
+        card.setAttribute("role", "link");
+        card.setAttribute("tabindex", "0");
+
+        card.title = `Lihat daftar ${config.title}`;
+
+        const openEquipment = () => {
+
+            const url = config.filter
+                ? `equipment.html?condition=${encodeURIComponent(config.filter)}`
+                : "equipment.html";
+
+            window.location.href = url;
+
+        };
+
+        card.addEventListener("click", openEquipment);
+
+        card.addEventListener("keydown", event => {
+
+            if (
+                event.key === "Enter" ||
+                event.key === " "
+            ) {
+
+                event.preventDefault();
+                openEquipment();
+
             }
 
+        });
 
-            const lastMaintenance =
-                new Date(
-                    item.last_maintenance_date
-                );
+    });
 
-
-            const difference =
-                today -
-                lastMaintenance;
-
-
-            const days =
-                difference /
-                (1000 * 60 * 60 * 24);
-
-
-            return days > 180;
-
-        }).length;
-
-
-    document.getElementById(
-        "activeEquipment"
-    ).textContent = active;
-
-
-    document.getElementById(
-        "inMaintenance"
-    ).textContent = maintenance;
-
-
-    document.getElementById(
-        "inactiveEquipment"
-    ).textContent = inactive;
-
-
-    document.getElementById(
-        "maintenanceDue"
-    ).textContent = maintenanceDue;
 }
 
 
@@ -404,20 +358,42 @@ function getConditionClass(condition) {
 
     switch (condition) {
 
-        case "Good":
+        case "baik":
             return "good";
 
-        case "Fair":
+        case "cukup":
             return "fair";
 
-        case "Poor":
+        case "buruk":
             return "poor";
-
-        case "Damaged":
-            return "damaged";
 
         default:
             return "";
+
+    }
+}
+
+
+// =========================================
+// FORMAT CONDITION
+// =========================================
+
+function formatCondition(condition) {
+
+    switch (condition) {
+
+        case "baik":
+            return "Baik";
+
+        case "cukup":
+            return "Cukup";
+
+        case "buruk":
+            return "Buruk";
+
+        default:
+            return condition || "-";
+
     }
 }
 
@@ -428,12 +404,9 @@ function getConditionClass(condition) {
 
 function escapeHtml(value) {
 
-    if (value === null ||
-        value === undefined) {
-
+    if (value === null || value === undefined) {
         return "";
     }
-
 
     return String(value)
         .replace(/&/g, "&amp;")
@@ -450,29 +423,19 @@ function escapeHtml(value) {
 
 document
     .getElementById("logoutButton")
-    .addEventListener(
-        "click",
-        async function () {
+    .addEventListener("click", async function () {
 
-            const confirmed =
-                confirm(
-                    "Apakah kamu yakin ingin logout?"
-                );
+        const confirmed = confirm(
+            "Apakah kamu yakin ingin logout?"
+        );
 
+        if (!confirmed) return;
 
-            if (!confirmed) {
-                return;
-            }
+        await client.auth.signOut();
 
+        window.location.href = "index.html";
 
-            await client.auth.signOut();
-
-
-            window.location.href =
-                "index.html";
-
-        }
-    );
+    });
 
 
 // =========================================
@@ -481,22 +444,16 @@ document
 
 async function initializeDashboard() {
 
-    const session =
-        await checkAuthentication();
+    const session = await checkAuthentication();
 
+    if (!session) return;
 
-    if (!session) {
-        return;
-    }
-
-
-    await loadProfile(
-        session.user.id
-    );
-
+    await loadProfile(session.user.id);
 
     await loadEquipment();
-}
 
+    setupDashboardCards();
+
+}
 
 initializeDashboard();
