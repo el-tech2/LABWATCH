@@ -1,4 +1,3 @@
-
 // =========================================
 // LABWATCH - EQUIPMENT MANAGEMENT
 // =========================================
@@ -49,6 +48,10 @@ async function initializeEquipmentPage() {
         await loadEquipment();
 
         populateCategoryFilter();
+
+        // Terapkan filter kondisi dari kartu Dashboard jika tersedia.
+        applyDashboardFilterFromUrl();
+
         applyRolePermissions();
 
     } catch (error) {
@@ -328,6 +331,22 @@ function populateCategoryFilter() {
 
         categoryFilter.appendChild(option);
     });
+}
+
+// =========================================
+// FILTER DARI DASHBOARD
+// =========================================
+
+function applyDashboardFilterFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const condition = params.get("condition");
+
+    const allowedConditions = ["baik", "cukup", "buruk"];
+
+    if (condition && allowedConditions.includes(condition)) {
+        conditionFilter.value = condition;
+        applyFilters();
+    }
 }
 
 // =========================================
@@ -724,6 +743,9 @@ resetFilterButton.addEventListener("click", function() {
     categoryFilter.value = "";
     conditionFilter.value = "";
     statusFilter.value = "";
+
+    // Hapus parameter filter dari URL setelah tombol Reset diklik.
+    window.history.replaceState({}, "", "equipment.html");
 
     renderEquipment(allEquipment);
 });
