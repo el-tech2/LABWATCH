@@ -499,6 +499,25 @@ function renderDamageRecords(
                                     ${
                                         isAdmin
                                             ? `
+
+                                                                                                
+                                                ${
+                                                    currentProfile?.role === "technician" &&
+                                                    item.status === "dilaporkan" &&
+                                                    !item.assigned_to
+                                                        ? `
+                                                            <button
+                                                                type="button"
+                                                                class="action-button edit"
+                                                                onclick="takeDamageReport('${item.id}')"
+                                                                title="Ambil Laporan"
+                                                            >
+                                                                Ambil
+                                                            </button>
+                                                        `
+                                                        : ""
+                                                }
+                         
                                                 <button
                                                     type="button"
                                                     class="action-button edit"
@@ -532,6 +551,84 @@ function renderDamageRecords(
             .join("");
 
 }
+
+
+
+// =========================================
+// TAKE DAMAGE REPORT
+// =========================================
+
+async function takeDamageReport(damageId) {
+
+    if (currentProfile?.role !== "technician") {
+        showMessage(
+            "Hanya Technician yang dapat mengambil laporan.",
+            "error"
+        );
+        return;
+    }
+
+    const confirmed = confirm(
+        "Apakah kamu yakin ingin mengambil laporan kerusakan ini?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+
+        const { data, error } = await client
+            .from("damage_records")
+            .update({
+                assigned_to: currentUser.id,
+                assigned_at: new Date().toISOString(),
+                status: "diproses"
+            })
+            .eq("id", damageId)
+            .eq("status", "dilaporkan")
+            .is("assigned_to", null)
+            .select("id")
+            .maybeSingle();
+
+        if (error) {
+            console.error("Take report error:", error);
+
+            showMessage(
+                "Gagal mengambil laporan: " + error.message,
+                "error"
+            );
+            return;
+        }
+
+        if (!data) {
+            showMessage(
+                "Laporan sudah diambil Technician lain atau statusnya sudah berubah.",
+                "error"
+            );
+
+            await loadDamageRecords();
+            return;
+        }
+
+        showMessage(
+            "Laporan berhasil diambil. Kamu menjadi Technician penanggung jawab.",
+            "success"
+        );
+
+        await loadDamageRecords();
+
+    } catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "Terjadi kesalahan saat mengambil laporan.",
+            "error"
+        );
+
+    }
+}
+
+window.takeDamageReport = takeDamageReport;
 
 
 // =========================================
@@ -616,712 +713,4 @@ function openAddModal() {
 
     if (
         !["admin", "technician"]
-            .includes(
-                currentProfile?.role
-            )
-    ) {
-
-        showMessage(
-            "Kamu tidak memiliki izin.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    editingDamageId =
-        null;
-
-
-    damageForm.reset();
-
-
-    document.getElementById(
-        "damageId"
-    ).value = "";
-
-
-    document.getElementById(
-        "damageDate"
-    ).value =
-        new Date()
-            .toISOString()
-            .split("T")[0];
-
-
-    document.getElementById(
-        "modalTitle"
-    ).textContent =
-        "Tambah Damage Record";
-
-
-    saveDamageButton.textContent =
-        "Simpan Damage Record";
-
-
-    damageModal.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-// =========================================
-// EDIT
-// =========================================
-
-function editDamage(
-    damageId
-) {
-
-    const item =
-        allDamageRecords.find(
-            record =>
-                String(record.id) ===
-                String(damageId)
-        );
-
-
-    if (!item) {
-
-        showMessage(
-            "Damage record tidak ditemukan.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    editingDamageId =
-        item.id;
-
-
-    document.getElementById(
-        "equipmentId"
-    ).value =
-        item.equipment_id;
-
-
-    document.getElementById(
-        "damageDate"
-    ).value =
-        item.damage_date;
-
-
-    document.getElementById(
-        "damageType"
-    ).value =
-        item.damage_type;
-
-
-    document.getElementById(
-        "severity"
-    ).value =
-        item.severity;
-
-
-    document.getElementById(
-        "description"
-    ).value =
-        item.description;
-
-
-    document.getElementById(
-        "actionTaken"
-    ).value =
-        item.action_taken || "";
-
-
-    document.getElementById(
-        "damageStatus"
-    ).value =
-        item.status;
-
-
-    document.getElementById(
-        "modalTitle"
-    ).textContent =
-        "Edit Damage Record";
-
-
-    saveDamageButton.textContent =
-        "Simpan Perubahan";
-
-
-    damageModal.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-window.editDamage =
-    editDamage;
-
-
-// =========================================
-// VIEW
-// =========================================
-
-function viewDamage(
-    damageId
-) {
-
-    const item =
-        allDamageRecords.find(
-            record =>
-                String(record.id) ===
-                String(damageId)
-        );
-
-
-    if (!item) {
-        return;
-    }
-
-
-    alert(
-        `Equipment: ${item.equipment?.name || "-"}\n\n` +
-        `Tanggal: ${formatDate(item.damage_date)}\n` +
-        `Kerusakan: ${item.damage_type}\n` +
-        `Severity: ${formatSeverity(item.severity)}\n` +
-        `Status: ${formatDamageStatus(item.status)}\n\n` +
-        `Deskripsi:\n${item.description || "-"}\n\n` +
-        `Tindakan:\n${item.action_taken || "-"}`
-    );
-
-}
-
-
-window.viewDamage =
-    viewDamage;
-
-
-// =========================================
-// SAVE
-// =========================================
-
-
-async function saveDamage(event) {
-
-    event.preventDefault();
-
-    const equipmentId =
-        document.getElementById("equipmentId").value;
-
-    const damageDate =
-        document.getElementById("damageDate").value;
-
-    const damageType =
-        document.getElementById("damageType").value.trim();
-
-    const severity =
-        document.getElementById("severity").value;
-
-    const description =
-        document.getElementById("description").value.trim();
-
-
-    // Validasi data laporan
-    if (
-        !equipmentId ||
-        !damageDate ||
-        !damageType ||
-        !severity ||
-        !description
-    ) {
-
-        showMessage(
-            "Lengkapi seluruh informasi kerusakan.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    // Data utama laporan
-    const damageData = {
-
-        equipment_id: equipmentId,
-
-        damage_date: damageDate,
-
-        damage_type: damageType,
-
-        severity: severity,
-
-        description: description
-
-    };
-
-
-    saveDamageButton.disabled = true;
-
-    saveDamageButton.textContent = "Menyimpan...";
-
-
-    try {
-
-        let error;
-
-
-        if (editingDamageId) {
-
-            // Edit hanya memperbarui informasi kerusakan.
-            // Status dan tindakan tidak diubah.
-
-            ({ error } = await client
-                .from("damage_records")
-                .update(damageData)
-                .eq("id", editingDamageId));
-
-        }
-
-        else {
-
-            // Laporan baru otomatis berstatus Dilaporkan.
-
-            ({ error } = await client
-                .from("damage_records")
-                .insert({
-
-                    ...damageData,
-
-                    reported_by: currentUser.id,
-
-                    status: "dilaporkan",
-
-                    action_taken: null,
-
-                    assigned_to: null,
-
-                    assigned_at: null,
-
-                    completed_at: null
-
-                }));
-
-        }
-
-
-        if (error) {
-
-            console.error(
-                "Save damage error:",
-                error
-            );
-
-            showMessage(
-                error.message,
-                "error"
-            );
-
-            return;
-        }
-
-
-        showMessage(
-            editingDamageId
-                ? "Informasi kerusakan berhasil diperbarui."
-                : "Laporan kerusakan berhasil dibuat. Status: Dilaporkan.",
-            "success"
-        );
-
-
-        closeModal();
-
-        await loadDamageRecords();
-
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Save damage error:",
-            error
-        );
-
-        showMessage(
-            "Terjadi kesalahan saat menyimpan laporan.",
-            "error"
-        );
-
-    }
-
-    finally {
-
-        saveDamageButton.disabled = false;
-
-        saveDamageButton.textContent =
-            editingDamageId
-                ? "Simpan Perubahan"
-                : "Simpan Damage Record";
-
-    }
-
-}
-
-
-// =========================================
-// DELETE
-// =========================================
-
-async function deleteDamage(
-    damageId
-) {
-
-    if (
-        currentProfile?.role !== "admin"
-    ) {
-
-        showMessage(
-            "Hanya Admin yang dapat menghapus damage record.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    const item =
-        allDamageRecords.find(
-            record =>
-                String(record.id) ===
-                String(damageId)
-        );
-
-
-    if (!item) {
-        return;
-    }
-
-
-    const confirmed =
-        confirm(
-            `Hapus damage record "${item.damage_type}"?`
-        );
-
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    const {
-        error
-    } = await client
-        .from("damage_records")
-        .delete()
-        .eq(
-            "id",
-            damageId
-        );
-
-
-    if (error) {
-
-        console.error(
-            error
-        );
-
-        showMessage(
-            error.message,
-            "error"
-        );
-
-        return;
-    }
-
-
-    showMessage(
-        "Damage record berhasil dihapus.",
-        "success"
-    );
-
-
-    await loadDamageRecords();
-
-}
-
-
-window.deleteDamage =
-    deleteDamage;
-
-
-// =========================================
-// MODAL
-// =========================================
-
-function closeModal() {
-
-    damageModal.classList.add(
-        "hidden"
-    );
-
-    damageForm.reset();
-
-    editingDamageId =
-        null;
-
-}
-
-
-closeModalButton.addEventListener(
-    "click",
-    closeModal
-);
-
-
-cancelModalButton.addEventListener(
-    "click",
-    closeModal
-);
-
-
-damageModal.addEventListener(
-    "click",
-    event => {
-
-        if (
-            event.target ===
-            damageModal
-        ) {
-
-            closeModal();
-
-        }
-
-    }
-);
-
-
-// =========================================
-// EVENTS
-// =========================================
-
-searchInput.addEventListener(
-    "input",
-    applyFilters
-);
-
-
-severityFilter.addEventListener(
-    "change",
-    applyFilters
-);
-
-
-statusFilter.addEventListener(
-    "change",
-    applyFilters
-);
-
-
-resetFilterButton.addEventListener(
-    "click",
-    () => {
-
-        searchInput.value = "";
-
-        severityFilter.value = "";
-
-        statusFilter.value = "";
-
-        renderDamageRecords(
-            allDamageRecords
-        );
-
-    }
-);
-
-
-addDamageButton.addEventListener(
-    "click",
-    openAddModal
-);
-
-
-damageForm.addEventListener(
-    "submit",
-    saveDamage
-);
-
-
-// =========================================
-// LOGOUT
-// =========================================
-
-document
-    .getElementById("logoutButton")
-    .addEventListener(
-        "click",
-        async () => {
-
-            const confirmed =
-                confirm(
-                    "Apakah kamu yakin ingin logout?"
-                );
-
-
-            if (!confirmed) {
-                return;
-            }
-
-
-            await client.auth.signOut();
-
-
-            window.location.href =
-                "index.html";
-
-        }
-    );
-
-
-// =========================================
-// HELPERS
-// =========================================
-
-function formatDate(
-    date
-) {
-
-    if (!date) {
-        return "-";
-    }
-
-
-    return new Date(
-        date
-    ).toLocaleDateString(
-        "id-ID",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
-    );
-
-}
-
-
-function formatSeverity(
-    severity
-) {
-
-    switch (severity) {
-
-        case "ringan":
-            return "Ringan";
-
-        case "sedang":
-            return "Sedang";
-
-        case "berat":
-            return "Berat";
-
-        default:
-            return severity || "-";
-
-    }
-
-}
-
-
-function formatDamageStatus(status) {
-
-    const statusMap = {
-
-        dilaporkan: "Dilaporkan",
-
-        diproses: "Diproses",
-
-        selesai: "Selesai"
-
-    };
-
-    return statusMap[status] || status;
-
-}
-
-
-function escapeHtml(
-    value
-) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-
-    }
-
-
-    return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-function showMessage(
-    message,
-    type
-) {
-
-    pageMessage.textContent =
-        message;
-
-
-    pageMessage.className =
-        `page-message ${type}`;
-
-
-    setTimeout(
-        () => {
-
-            pageMessage.classList.add(
-                "hidden"
-            );
-
-        },
-        4000
-    );
-
-}
-
-
-// =========================================
-// START
-// =========================================
-
-initializeDamagePage();
+            .incl
