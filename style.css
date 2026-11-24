@@ -1555,8 +1555,25 @@ body {
 
 
     .user-info {
-        display: none;
-    }
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.user-info strong {
+    font-size: 11px;
+}
+
+.user-info small {
+    font-size: 10px;
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+    flex-shrink: 0;
+}
 
 }
 
