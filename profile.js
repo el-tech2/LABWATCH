@@ -79,6 +79,11 @@ async function loadProfile() {
 // RENDER PROFILE
 // =========================================
 
+
+// =========================================
+// RENDER PROFILE
+// =========================================
+
 function renderProfile() {
 
     if (!currentUser) {
@@ -95,10 +100,11 @@ function renderProfile() {
 
     // Username akun
     const username =
-        currentProfile?.username ||
-        currentProfile?.name ||
-        currentUser.email?.split("@")[0] ||
-        "User";
+    currentProfile?.full_name ||
+    currentProfile?.username ||
+    currentProfile?.name ||
+    currentUser.email?.split("@")[0] ||
+    "User";
 
     // Role pengguna
     const role =
@@ -214,6 +220,7 @@ function renderProfile() {
     }
 
 }
+
 
 
 
