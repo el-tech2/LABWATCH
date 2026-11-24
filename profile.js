@@ -74,38 +74,50 @@ async function loadProfile() {
 // RENDER PROFILE
 // =========================================
 
+
+// =========================================
+// RENDER PROFILE
+// =========================================
+
 function renderProfile() {
 
     if (!currentUser) {
         return;
     }
 
+    // Nama lengkap pengguna
+    const fullName =
+        currentProfile?.full_name ||
+        currentProfile?.name ||
+        currentProfile?.username ||
+        currentUser.email?.split("@")[0] ||
+        "User";
 
-    // Username
+    // Username akun
     const username =
         currentProfile?.username ||
         currentProfile?.name ||
         currentUser.email?.split("@")[0] ||
         "User";
 
-
-    // Role
+    // Role pengguna
     const role =
         currentProfile?.role ||
         "user";
 
-
-    // Email
+    // Email pengguna
     const email =
         currentUser.email ||
         "-";
 
-
-    // Initial
-    const initial =
-        username
-            .charAt(0)
-            .toUpperCase();
+    // Inisial nama lengkap
+    const initial = fullName
+        .trim()
+        .split(/\s+/)
+        .map(word => word.charAt(0))
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
 
 
     // =====================================
@@ -123,26 +135,16 @@ function renderProfile() {
 
 
     if (userAvatar) {
-
         userAvatar.textContent = initial;
-
     }
-
 
     if (userName) {
-
-        userName.textContent = username;
-
+        userName.textContent = fullName;
     }
-
 
     if (userRole) {
-
-        userRole.textContent =
-            formatRole(role);
-
+        userRole.textContent = formatRole(role);
     }
-
 
 
     // =====================================
@@ -160,26 +162,16 @@ function renderProfile() {
 
 
     if (profileAvatar) {
-
         profileAvatar.textContent = initial;
-
     }
-
 
     if (profileName) {
-
-        profileName.textContent = username;
-
+        profileName.textContent = fullName;
     }
-
 
     if (profileRole) {
-
-        profileRole.textContent =
-            formatRole(role);
-
+        profileRole.textContent = formatRole(role);
     }
-
 
 
     // =====================================
@@ -197,28 +189,16 @@ function renderProfile() {
 
 
     if (profileUsername) {
-
-        profileUsername.textContent =
-            username;
-
+        profileUsername.textContent = username;
     }
-
 
     if (profileEmail) {
-
-        profileEmail.textContent =
-            email;
-
+        profileEmail.textContent = email;
     }
-
 
     if (profileRoleInfo) {
-
-        profileRoleInfo.textContent =
-            formatRole(role);
-
+        profileRoleInfo.textContent = formatRole(role);
     }
-
 
 
     // =====================================
@@ -230,13 +210,11 @@ function renderProfile() {
 
 
     if (userId) {
-
-        userId.textContent =
-            currentUser.id;
-
+        userId.textContent = currentUser.id;
     }
 
 }
+
 
 
 
